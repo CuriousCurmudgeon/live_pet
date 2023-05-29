@@ -4,6 +4,8 @@ defmodule LivePet.PetsFixtures do
   entities via the `LivePet.Pets` context.
   """
 
+  import LivePet.AccountsFixtures
+
   @doc """
   Generate a pet.
   """
@@ -11,8 +13,9 @@ defmodule LivePet.PetsFixtures do
     {:ok, pet} =
       attrs
       |> Enum.into(%{
-        age: 42,
-        name: "some name"
+        age: 0,
+        name: "some name",
+        user_id: user_fixture().id
       })
       |> LivePet.Pets.create_pet()
 

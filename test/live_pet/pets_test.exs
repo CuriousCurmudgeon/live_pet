@@ -6,7 +6,7 @@ defmodule LivePet.PetsTest do
   describe "pets" do
     alias LivePet.Pets.Pet
 
-    import LivePet.PetsFixtures
+    import LivePet.{AccountsFixtures, PetsFixtures}
 
     @invalid_attrs %{age: nil, name: nil}
 
@@ -21,7 +21,7 @@ defmodule LivePet.PetsTest do
     end
 
     test "create_pet/1 with valid data creates a pet" do
-      valid_attrs = %{age: 42, name: "some name"}
+      valid_attrs = %{age: 42, name: "some name", user_id: user_fixture().id}
 
       assert {:ok, %Pet{} = pet} = Pets.create_pet(valid_attrs)
       assert pet.age == 42
@@ -29,7 +29,7 @@ defmodule LivePet.PetsTest do
     end
 
     test "create_pet/1 defaults age to 0" do
-      valid_attrs = %{name: "some name"}
+      valid_attrs = %{name: "some name", user_id: user_fixture().id}
 
       assert {:ok, %Pet{} = pet} = Pets.create_pet(valid_attrs)
       assert pet.age == 0

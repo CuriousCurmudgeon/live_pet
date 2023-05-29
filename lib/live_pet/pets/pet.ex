@@ -5,7 +5,7 @@ defmodule LivePet.Pets.Pet do
   schema "pets" do
     field :age, :integer, default: 0
     field :name, :string
-    field :user_id, :id
+    belongs_to :user, LivePet.Accounts.User
 
     timestamps()
   end
@@ -13,7 +13,7 @@ defmodule LivePet.Pets.Pet do
   @doc false
   def changeset(pet, attrs) do
     pet
-    |> cast(attrs, [:name, :age])
-    |> validate_required([:name, :age])
+    |> cast(attrs, [:name, :age, :user_id])
+    |> validate_required([:name, :age, :user_id])
   end
 end
