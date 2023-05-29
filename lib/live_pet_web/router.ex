@@ -21,6 +21,7 @@ defmodule LivePetWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    live "/pets/new", NewPetLive
   end
 
   # Other scopes may use custom stacks.
