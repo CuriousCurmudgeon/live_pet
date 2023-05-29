@@ -7,6 +7,8 @@ defmodule LivePet.Pets.Server do
 
   use GenServer
 
+  @tick_length_in_milliseconds 5 * 1000
+
   ### Client process
   def start_link(_) do
     GenServer.start_link(__MODULE__, nil, name: "pet")
@@ -14,6 +16,17 @@ defmodule LivePet.Pets.Server do
 
   ### Server process
   def init(_) do
+    schedule_tick()
     {:ok, {"test"}}
+  end
+
+  def handle_info(:tick, state) do
+    IO.puts("tick")
+    schedule_tick()
+    {:noreply, state}
+  end
+
+  defp schedule_tick do
+    Process.send_after(self(), :tick, @tick_length_in_milliseconds)
   end
 end
