@@ -1,1 +1,11 @@
 <.header>New Pet</.header>
+
+<.simple_form for={@form} id="pet_form" phx-change="validate" phx-submit="save">
+  <.input field={@form[:name]} type="text" label="Name" required />
+
+  <:actions>
+    <.button phx-disable-with="Creating pet..." class="w-full">
+      Create Pet <span aria-hidden="true">→</span>
+    </.button>
+  </:actions>
+</.simple_form>
