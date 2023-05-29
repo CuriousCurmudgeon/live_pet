@@ -22,6 +22,8 @@ defmodule LivePetWeb.NewPetLive do
   end
 
   def handle_event("save", %{"pet" => pet_params}, socket) do
+    pet_params = params_with_user_id(pet_params, socket)
+
     case Pets.create_pet(pet_params) do
       {:ok, _pet} ->
         {:noreply, socket |> put_flash(:info, "Pet created successfully") |> redirect(to: ~p"/")}
@@ -33,5 +35,10 @@ defmodule LivePetWeb.NewPetLive do
 
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do
     assign(socket, :form, to_form(changeset))
+  end
+
+  defp params_with_user_id(params, %{assigns: %{current_user: current_user}}) do
+    params
+    |> Map.put("user_id", current_user.id)
   end
 end
