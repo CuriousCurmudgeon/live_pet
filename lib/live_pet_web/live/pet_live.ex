@@ -18,7 +18,7 @@ defmodule LivePetWeb.PetLive do
     socket
     |> assign(
       :server_id,
-      GenServer.start_link(LivePet.Pets.Server, :ok)
+      LivePet.Pets.Server.start_link(pet)
     )
   end
 end
