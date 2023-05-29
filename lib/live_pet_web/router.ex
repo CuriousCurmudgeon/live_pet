@@ -70,6 +70,7 @@ defmodule LivePetWeb.Router do
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
 
       live "/pets/new", NewPetLive
+      live "/pets/:id", PetLive
     end
   end
 

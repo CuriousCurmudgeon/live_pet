@@ -25,8 +25,11 @@ defmodule LivePetWeb.NewPetLive do
     pet_params = params_with_user_id(pet_params, socket)
 
     case Pets.create_pet(pet_params) do
-      {:ok, _pet} ->
-        {:noreply, socket |> put_flash(:info, "Pet created successfully") |> redirect(to: ~p"/")}
+      {:ok, pet} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Pet created successfully")
+         |> push_navigate(to: ~p"/pets/#{pet.id}")}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign_form(socket, changeset)}
