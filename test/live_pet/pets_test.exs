@@ -28,6 +28,13 @@ defmodule LivePet.PetsTest do
       assert pet.name == "some name"
     end
 
+    test "create_pet/1 defaults age to 0" do
+      valid_attrs = %{name: "some name"}
+
+      assert {:ok, %Pet{} = pet} = Pets.create_pet(valid_attrs)
+      assert pet.age == 0
+    end
+
     test "create_pet/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} = Pets.create_pet(@invalid_attrs)
     end

@@ -3,7 +3,7 @@ defmodule LivePet.Pets.Pet do
   import Ecto.Changeset
 
   schema "pets" do
-    field :age, :integer
+    field :age, :integer, default: 0
     field :name, :string
     field :user_id, :id
 
