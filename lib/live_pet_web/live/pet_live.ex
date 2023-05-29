@@ -6,6 +6,19 @@ defmodule LivePetWeb.PetLive do
   @impl true
   def mount(%{"id" => id}, _session, socket) do
     pet = Pets.get_pet!(id)
+
+    if connected?(socket) do
+      start_pet_server(socket, pet)
+    end
+
     {:ok, socket |> assign(:pet, pet)}
+  end
+
+  defp start_pet_server(socket, pet) do
+    socket
+    |> assign(
+      :server_id,
+      GenServer.start_link(LivePet.Pets.Server, :ok)
+    )
   end
 end
