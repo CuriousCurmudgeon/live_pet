@@ -21,6 +21,12 @@ defmodule LivePet.Pets do
     Repo.all(Pet)
   end
 
+  def list_live_pets do
+    Pet
+    |> where([p], p.age < 1000)
+    |> Repo.all()
+  end
+
   @doc """
   Gets a single pet.
 
