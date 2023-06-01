@@ -2,8 +2,6 @@ defmodule LivePet.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   @moduledoc false
-  alias LivePet.PetSupervisor
-
   use Application
 
   @impl true
@@ -21,17 +19,13 @@ defmodule LivePet.Application do
       LivePetWeb.Endpoint,
       # Start a worker by calling: LivePet.Worker.start_link(arg)
       # {LivePet.Worker, arg}
-      PetSupervisor
+      LivePet.PetInitSupervisor
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: LivePet.Supervisor]
-    supervisor = Supervisor.start_link(children, opts)
-
-    PetSupervisor.start_pets()
-
-    supervisor
+    Supervisor.start_link(children, opts)
   end
 
   # Tell Phoenix to update the endpoint configuration

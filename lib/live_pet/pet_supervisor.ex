@@ -18,6 +18,6 @@ defmodule LivePet.PetSupervisor do
   end
 
   defp start_pet_server(pet) do
-    DynamicSupervisor.start_child(PetSupervisor, {Pets.Server, pet})
+    DynamicSupervisor.start_child(LivePet.PetSupervisor, {Pets.Server, pet})
   end
 end
