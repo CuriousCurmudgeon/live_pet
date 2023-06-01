@@ -1,5 +1,5 @@
 defmodule LivePet.PetSupervisor do
-  use DynamicSupervisor
+  use DynamicSupervisor, restart: :transient
 
   alias LivePet.Pets
 
