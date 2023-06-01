@@ -6,6 +6,24 @@ defmodule LivePetWeb.PetLive do
   @impl true
   def mount(%{"id" => id}, _session, socket) do
     pet = Pets.get_pet!(id)
-    {:ok, socket |> assign(:pet, pet)}
+
+    if connected?(socket) do
+      register_for_updates(pet)
+    end
+
+    {:ok, assign_pet(socket, pet)}
+  end
+
+  defp register_for_updates(pet) do
+    {:ok, _} = Registry.register(Registry.PetViewers, "pet-#{pet.id}", [])
+  end
+
+  @impl true
+  def handle_info({:tick, pet}, socket) do
+    {:noreply, assign_pet(socket, pet)}
+  end
+
+  defp assign_pet(socket, pet) do
+    assign(socket, :pet, pet)
   end
 end

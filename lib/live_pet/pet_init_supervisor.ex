@@ -15,6 +15,8 @@ defmodule LivePet.PetInitSupervisor do
   @impl true
   def init(_init_arg) do
     children = [
+      {Registry,
+       keys: :duplicate, name: Registry.PetViewers, partitions: System.schedulers_online()},
       PetSupervisor,
       {Task, &PetSupervisor.start_pets/0}
     ]
