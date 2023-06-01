@@ -17,7 +17,8 @@ defmodule LivePet.PetSupervisor do
     |> Enum.map(&start_pet_server/1)
   end
 
-  defp start_pet_server(pet) do
+  def start_pet_server(pet) do
+    # TODO: Add error handling
     DynamicSupervisor.start_child(LivePet.PetSupervisor, {Pets.Server, pet})
   end
 end

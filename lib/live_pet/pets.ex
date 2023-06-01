@@ -4,6 +4,7 @@ defmodule LivePet.Pets do
   """
 
   import Ecto.Query, warn: false
+  alias LivePet.PetSupervisor
   alias LivePet.Repo
 
   alias LivePet.Pets.Pet
@@ -59,7 +60,15 @@ defmodule LivePet.Pets do
     %Pet{}
     |> Pet.changeset(attrs)
     |> Repo.insert()
+    |> maybe_start_pet_server()
   end
+
+  defp maybe_start_pet_server({:ok, pet} = result) do
+    PetSupervisor.start_pet_server(pet)
+    result
+  end
+
+  defp maybe_start_pet_server({:error, _} = result), do: result
 
   @doc """
   Updates a pet.
