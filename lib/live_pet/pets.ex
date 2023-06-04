@@ -24,7 +24,7 @@ defmodule LivePet.Pets do
 
   def list_live_pets do
     Pet
-    |> where([p], p.age < 1000)
+    |> where([p], p.age < 10000)
     |> Repo.all()
   end
 
