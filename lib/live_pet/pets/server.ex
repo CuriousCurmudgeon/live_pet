@@ -17,13 +17,14 @@ defmodule LivePet.Pets.Server do
 
   ### Server process
   def init(pet) do
+    {:ok, _} = Registry.register(Registry.Pets, pet.id, [])
     schedule_tick()
     {:ok, {pet}}
   end
 
   def handle_info(:tick, {pet}) do
     {:ok, pet} = Pets.update_pet(pet, %{age: pet.age + 1})
-    # TODO: Broadcast an event about the update
+
     Registry.dispatch(Registry.PetViewers, "pet-#{pet.id}", fn entries ->
       for {pid, _} <- entries, do: send(pid, {:tick, pet})
     end)
