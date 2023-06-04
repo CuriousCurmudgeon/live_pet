@@ -18,4 +18,20 @@ defmodule LivePet.Pets.Pet do
     |> validate_required([:name, :age, :hunger, :user_id])
     |> validate_number(:hunger, greater_than_or_equal_to: 0)
   end
+
+  @doc """
+  Calculate the pet's next hunger. Typically, this will be called on
+  every tick.
+  """
+  def calculate_next_hunger(pet) do
+    pet.hunger + 1
+  end
+
+  @doc """
+  Calculate the pet's next age. Typically, this will be called on
+  every tick.
+  """
+  def calculate_next_age(pet) do
+    pet.age + 1
+  end
 end

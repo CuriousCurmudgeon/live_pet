@@ -7,6 +7,7 @@ defmodule LivePet.Pets.Server do
 
   use GenServer
   alias LivePet.Pets
+  alias LivePet.Pets.Pet
 
   @tick_length_in_milliseconds 5 * 1000
 
@@ -29,7 +30,11 @@ defmodule LivePet.Pets.Server do
   end
 
   def handle_info(:tick, {pet}) do
-    {:ok, pet} = Pets.update_pet(pet, %{age: pet.age + 1})
+    {:ok, pet} =
+      Pets.update_pet(pet, %{
+        age: Pet.calculate_next_age(pet),
+        hunger: Pet.calculate_next_hunger(pet)
+      })
 
     Registry.dispatch(Registry.PetViewers, "pet-#{pet.id}", fn entries ->
       for {pid, _} <- entries, do: send(pid, {:tick, pet})
