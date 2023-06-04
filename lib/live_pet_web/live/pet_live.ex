@@ -23,6 +23,11 @@ defmodule LivePetWeb.PetLive do
     {:noreply, assign_pet(socket, pet)}
   end
 
+  @impl true
+  def handle_event("ping", _, socket) do
+    {:noreply, socket}
+  end
+
   defp assign_pet(socket, pet) do
     assign(socket, :pet, pet)
   end

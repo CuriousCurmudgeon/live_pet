@@ -1,5 +1,7 @@
 <.header><%= @pet.name %></.header>
 
 <.list>
-    <:item title="Age"><%= @pet.age %></:item>
+  <:item title="Age"><%= @pet.age %></:item>
 </.list>
+
+<.button phx-click="ping" class="ml-2">Ping!</.button>
