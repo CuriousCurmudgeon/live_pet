@@ -34,4 +34,8 @@ defmodule LivePet.Pets.Pet do
   def calculate_next_age(pet) do
     pet.age + 1
   end
+
+  def feed(pet) do
+    %{pet | hunger: Kernel.max(pet.hunger - 100, 0)}
+  end
 end

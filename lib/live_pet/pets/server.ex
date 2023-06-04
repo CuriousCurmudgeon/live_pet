@@ -17,9 +17,20 @@ defmodule LivePet.Pets.Server do
   end
 
   def ping(pet) do
+    lookup_pid(pet)
+    |> GenServer.cast({:ping})
+  end
+
+  def feed(pet) do
+    lookup_pid(pet)
+    |> GenServer.call(:feed)
+  end
+
+  defp lookup_pid(pet) do
     # TODO: Error handling. We should find exactly one pet in the Registry
     Registry.lookup(Registry.Pets, pet.id)
-    |> Enum.each(fn {pid, _} -> GenServer.cast(pid, {:ping}) end)
+    |> List.first()
+    |> elem(0)
   end
 
   ### Server process
@@ -44,8 +55,12 @@ defmodule LivePet.Pets.Server do
     {:noreply, {pet}}
   end
 
+  def handle_call(:feed, _, {pet}) do
+    {:ok, pet} = Pets.update_pet(pet, Map.from_struct(Pet.feed(pet)))
+    {:reply, pet, {pet}}
+  end
+
   def handle_cast({:ping}, {pet}) do
-    IO.puts("pinging pet #{pet.id}")
     {:noreply, {pet}}
   end
 

@@ -29,6 +29,11 @@ defmodule LivePetWeb.PetLive do
     {:noreply, socket}
   end
 
+  def handle_event("feed", _, %{assigns: %{pet: pet}} = socket) do
+    pet = Pets.Server.feed(pet)
+    {:noreply, assign_pet(socket, pet)}
+  end
+
   defp assign_pet(socket, pet) do
     assign(socket, :pet, pet)
   end
