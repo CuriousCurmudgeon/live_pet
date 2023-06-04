@@ -24,7 +24,8 @@ defmodule LivePetWeb.PetLive do
   end
 
   @impl true
-  def handle_event("ping", _, socket) do
+  def handle_event("ping", _, %{assigns: %{pet: pet}} = socket) do
+    Pets.Server.ping(pet)
     {:noreply, socket}
   end
 

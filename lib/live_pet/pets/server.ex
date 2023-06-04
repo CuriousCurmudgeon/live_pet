@@ -15,6 +15,12 @@ defmodule LivePet.Pets.Server do
     GenServer.start_link(__MODULE__, pet)
   end
 
+  def ping(pet) do
+    # TODO: Error handling. We should find exactly one pet in the Registry
+    Registry.lookup(Registry.Pets, pet.id)
+    |> Enum.each(fn {pid, _} -> GenServer.cast(pid, {:ping}) end)
+  end
+
   ### Server process
   def init(pet) do
     {:ok, _} = Registry.register(Registry.Pets, pet.id, [])
@@ -30,6 +36,11 @@ defmodule LivePet.Pets.Server do
     end)
 
     schedule_tick()
+    {:noreply, {pet}}
+  end
+
+  def handle_cast({:ping}, {pet}) do
+    IO.puts("pinging pet #{pet.id}")
     {:noreply, {pet}}
   end
 
