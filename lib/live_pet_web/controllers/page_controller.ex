@@ -11,6 +11,6 @@ defmodule LivePetWeb.PageController do
   end
 
   defp redirect_user(%{assigns: %{current_user: _}} = conn) do
-    redirect(conn, to: ~p"/pets/new")
+    redirect(conn, to: ~p"/pets")
   end
 end
