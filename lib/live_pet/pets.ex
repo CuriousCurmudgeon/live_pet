@@ -22,6 +22,21 @@ defmodule LivePet.Pets do
     Repo.all(Pet)
   end
 
+  @doc """
+  List all the pets for the given user ordered by name
+
+  ## Examples
+
+      iex> list_pets()
+      [%Pet{}, ...]
+  """
+  def list_pets_for_user(user) do
+    Pet
+    |> where([p], p.user_id == ^user.id)
+    |> order_by(:name)
+    |> Repo.all()
+  end
+
   def list_live_pets do
     Pet
     |> where([p], p.age < 10000)

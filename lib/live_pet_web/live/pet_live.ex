@@ -5,6 +5,7 @@ defmodule LivePetWeb.PetLive do
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
+    # TODO: Make sure the logged in user owns the pet
     pet = Pets.get_pet!(id)
 
     if connected?(socket) do
