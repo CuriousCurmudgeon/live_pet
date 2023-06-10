@@ -1,4 +1,11 @@
-<.header>Your Pets</.header>
+<.header>
+  Your Pets
+  <:actions>
+    <.link patch={~p"/pets/new"}>
+      <.button>New Pet</.button>
+    </.link>
+  </:actions>
+</.header>
 
 <.table id="pets" rows={@pets}>
   <:col :let={pet} label="id"><%= pet.id %></:col>
