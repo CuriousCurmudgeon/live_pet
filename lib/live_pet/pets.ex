@@ -39,8 +39,23 @@ defmodule LivePet.Pets do
 
   def list_live_pets do
     Pet
-    |> where([p], p.age < 10000)
+    |> filter_live()
     |> Repo.all()
+  end
+
+  @doc """
+  List up to limit pets that haven't been updated since the timestamp.
+  """
+  def list_stale_pets(updated_timestamp, limit) do
+    Pet
+    |> filter_live()
+    |> where([p], p.updated_at < ^updated_timestamp)
+    |> limit(^limit)
+    |> Repo.all()
+  end
+
+  defp filter_live(query) do
+    where(query, [p], p.age < 10000)
   end
 
   @doc """

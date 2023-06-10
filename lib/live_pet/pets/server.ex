@@ -16,6 +16,13 @@ defmodule LivePet.Pets.Server do
     GenServer.start_link(__MODULE__, pet, name: get_process_name(pet))
   end
 
+  @doc """
+  Get the current state of the pet.
+  """
+  def get(pet) do
+    GenServer.call(get_process_name(pet), :get)
+  end
+
   def ping(pet) do
     GenServer.cast(get_process_name(pet), {:ping})
   end
@@ -35,18 +42,18 @@ defmodule LivePet.Pets.Server do
   end
 
   def handle_info(:tick, {pet}) do
-    {:ok, pet} =
-      Pets.update_pet(pet, %{
-        age: Pet.calculate_next_age(pet),
-        hunger: Pet.calculate_next_hunger(pet)
-      })
+    schedule_tick()
+    pet = %{pet | age: Pet.calculate_next_age(pet), hunger: Pet.calculate_next_hunger(pet)}
 
     Registry.dispatch(Registry.PetViewers, "pet-#{pet.id}", fn entries ->
       for {pid, _} <- entries, do: send(pid, {:tick, pet})
     end)
 
-    schedule_tick()
     {:noreply, {pet}}
+  end
+
+  def handle_call(:get, _, {pet}) do
+    {:reply, pet, {pet}}
   end
 
   def handle_call(:feed, _, {pet}) do
