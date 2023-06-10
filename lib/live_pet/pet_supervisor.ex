@@ -14,11 +14,12 @@ defmodule LivePet.PetSupervisor do
 
   def start_pets() do
     Pets.list_live_pets()
+    |> tap(fn pets -> IO.puts("Starting #{length(pets)} pets") end)
     |> Enum.map(&start_pet_server/1)
   end
 
   def start_pet_server(pet) do
     # TODO: Add error handling
-    DynamicSupervisor.start_child(LivePet.PetSupervisor, {Pets.Server, pet})
+    {:ok, _} = DynamicSupervisor.start_child(LivePet.PetSupervisor, {Pets.Server, pet})
   end
 end
