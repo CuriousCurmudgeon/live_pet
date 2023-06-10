@@ -19,7 +19,8 @@ defmodule LivePet.Application do
       LivePetWeb.Endpoint,
       # Start a worker by calling: LivePet.Worker.start_link(arg)
       # {LivePet.Worker, arg}
-      LivePet.PetInitSupervisor
+      LivePet.PetInitSupervisor,
+      LivePet.Pets.Persister
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
