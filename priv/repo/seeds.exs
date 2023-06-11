@@ -16,7 +16,7 @@ alias LivePet.Repo
 
 # Repo.delete_all(Pet)
 
-pet_count = 10
+pet_count = 100_000
 chunk_size = 10_000
 
 # Copied from LivePet.AccountsFixtures. Test module stuff

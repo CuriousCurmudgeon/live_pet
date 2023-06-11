@@ -5,7 +5,6 @@ defmodule LivePet.Pets.Persister do
   """
 
   use GenServer
-  import Ecto.Changeset
   alias Ecto.Multi
   alias LivePet.Pets
   alias LivePet.Repo
@@ -25,12 +24,6 @@ defmodule LivePet.Pets.Persister do
   end
 
   def handle_info(:persist, {timestamp}) do
-    # TODO:
-    # - Track the last persist timestamp in the state
-    # - Load pets in chunks of 1000 with an updated timestamp before that
-    # - Get the state of each of those pets from their process
-    # - Create a changeset for each using Ecto.Multi
-    # - Persist
     schedule_persist()
     IO.puts("Starting pet persistence")
     persist_pets(timestamp)
@@ -73,6 +66,6 @@ defmodule LivePet.Pets.Persister do
   end
 
   defp get_pet_changeset({stale_pet, current_pet}) do
-    change(stale_pet, %{age: current_pet.age, hunger: current_pet.hunger})
+    Pets.change_pet(stale_pet, %{age: current_pet.age, hunger: current_pet.hunger})
   end
 end

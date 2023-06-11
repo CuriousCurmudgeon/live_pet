@@ -19,7 +19,13 @@ defmodule LivePet.PetSupervisor do
   end
 
   def start_pet_server(pet) do
-    # TODO: Add error handling
-    {:ok, _} = DynamicSupervisor.start_child(LivePet.PetSupervisor, {Pets.Server, pet})
+    case DynamicSupervisor.start_child(LivePet.PetSupervisor, {Pets.Server, pet}) do
+      {:ok, _} ->
+        nil
+
+      {:error, error} ->
+        # TODO: improved error handling
+        IO.inspect(error)
+    end
   end
 end
