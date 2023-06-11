@@ -14,24 +14,35 @@ defmodule LivePet.PetSupervisor do
   end
 
   def start_pets() do
-    %{active: partition_count} = PartitionSupervisor.count_children(__MODULE__)
+    Logger.info("Starting all alive pets")
 
-    Pets.list_live_pets()
-    |> tap(&Logger.info("Starting #{length(&1)} pets"))
-    |> Enum.map(&start_pet_server(&1, partition_count))
+    start_timestamp = DateTime.utc_now()
+
+    number_started =
+      Pets.list_live_pets()
+      |> tap(&Logger.info("Starting #{length(&1)} pets"))
+      |> Enum.map(&start_pet_server/1)
+      |> Enum.filter(fn result -> result != nil end)
+      |> length()
+
+    duration = DateTime.diff(DateTime.utc_now(), start_timestamp, :millisecond)
+    Logger.info("Started #{number_started} pets in #{duration} milliseconds")
   end
 
-  def start_pet_server(pet, partition_count) do
+  def start_pet_server(pet) do
+    %{active: partition_count} = PartitionSupervisor.count_children(__MODULE__)
+
     case DynamicSupervisor.start_child(
            {:via, PartitionSupervisor, {__MODULE__, :rand.uniform(partition_count)}},
            {Pets.Server, pet}
          ) do
-      {:ok, _} ->
-        nil
+      {:ok, pid} ->
+        pid
 
       {:error, error} ->
         # TODO: improved error handling
         Logger.error(inspect(error))
+        nil
     end
   end
 end
