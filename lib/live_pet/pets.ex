@@ -50,6 +50,7 @@ defmodule LivePet.Pets do
     Pet
     |> filter_live()
     |> where([p], p.updated_at < ^updated_timestamp)
+    |> order_by([p], :updated_at)
     |> limit(^limit)
     |> Repo.all()
   end
