@@ -17,7 +17,7 @@ defmodule LivePet.PetInitSupervisor do
     children = [
       {Registry,
        keys: :duplicate, name: Registry.PetViewers, partitions: System.schedulers_online()},
-      PetSupervisor,
+      {PartitionSupervisor, child_spec: DynamicSupervisor, name: LivePet.PetSupervisor},
       {Task, &PetSupervisor.start_pets/0}
     ]
 

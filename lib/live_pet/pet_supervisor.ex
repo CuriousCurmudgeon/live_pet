@@ -14,13 +14,18 @@ defmodule LivePet.PetSupervisor do
   end
 
   def start_pets() do
+    %{active: partition_count} = PartitionSupervisor.count_children(__MODULE__)
+
     Pets.list_live_pets()
     |> tap(&Logger.info("Starting #{length(&1)} pets"))
-    |> Enum.map(&start_pet_server/1)
+    |> Enum.map(&start_pet_server(&1, partition_count))
   end
 
-  def start_pet_server(pet) do
-    case DynamicSupervisor.start_child(LivePet.PetSupervisor, {Pets.Server, pet}) do
+  def start_pet_server(pet, partition_count) do
+    case DynamicSupervisor.start_child(
+           {:via, PartitionSupervisor, {__MODULE__, :rand.uniform(partition_count)}},
+           {Pets.Server, pet}
+         ) do
       {:ok, _} ->
         nil
 
