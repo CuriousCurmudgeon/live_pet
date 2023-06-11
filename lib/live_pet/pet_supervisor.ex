@@ -1,6 +1,7 @@
 defmodule LivePet.PetSupervisor do
   use DynamicSupervisor, restart: :transient
 
+  require Logger
   alias LivePet.Pets
 
   def start_link(init_arg) do
@@ -14,7 +15,7 @@ defmodule LivePet.PetSupervisor do
 
   def start_pets() do
     Pets.list_live_pets()
-    |> tap(fn pets -> IO.puts("Starting #{length(pets)} pets") end)
+    |> tap(&Logger.info("Starting #{length(&1)} pets"))
     |> Enum.map(&start_pet_server/1)
   end
 
@@ -25,7 +26,7 @@ defmodule LivePet.PetSupervisor do
 
       {:error, error} ->
         # TODO: improved error handling
-        IO.inspect(error)
+        Logger.error(inspect(error))
     end
   end
 end

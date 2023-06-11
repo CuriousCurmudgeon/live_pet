@@ -5,6 +5,7 @@ defmodule LivePet.Pets.Persister do
   """
 
   use GenServer
+  require Logger
   alias Ecto.Multi
   alias LivePet.Pets
   alias LivePet.Repo
@@ -25,8 +26,10 @@ defmodule LivePet.Pets.Persister do
 
   def handle_info(:persist, {timestamp}) do
     schedule_persist()
-    IO.puts("Starting pet persistence")
-    persist_pets(timestamp)
+    Logger.info("Starting pet persistence")
+    total_updated = persist_pets(timestamp)
+
+    Logger.info("Updated #{total_updated} pets")
 
     {:noreply, new_state()}
   end
@@ -39,14 +42,14 @@ defmodule LivePet.Pets.Persister do
     Process.send_after(self(), :persist, @persist_interval_in_milliseconds)
   end
 
-  defp persist_pets(timestamp) do
+  defp persist_pets(timestamp, total_updated \\ 0) do
     Pets.list_stale_pets(timestamp, @load_limit)
-    |> maybe_persist(timestamp)
+    |> maybe_persist(timestamp, total_updated)
   end
 
-  defp maybe_persist([], _), do: nil
+  defp maybe_persist([], _, total_updated), do: total_updated
 
-  defp maybe_persist(stale_pets, timestamp) do
+  defp maybe_persist(stale_pets, timestamp, total_updated) do
     {:ok, updated_pets} =
       stale_pets
       |> Enum.map(fn stale_pet -> {stale_pet, get_current_pet_state(stale_pet)} end)
@@ -56,9 +59,9 @@ defmodule LivePet.Pets.Persister do
       end)
       |> Repo.transaction()
 
-    IO.puts("Updated #{Map.keys(updated_pets) |> length()} pets")
+    # Logger.info("Updated #{Map.keys(updated_pets) |> length()} pets")
 
-    persist_pets(timestamp)
+    persist_pets(timestamp, total_updated + (Map.keys(updated_pets) |> length()))
   end
 
   defp get_current_pet_state(stale_pet) do
