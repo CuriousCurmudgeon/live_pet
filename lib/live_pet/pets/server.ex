@@ -14,92 +14,89 @@ defmodule LivePet.Pets.Server do
 
   ### Client process
   def start_link(pet) do
-    GenServer.start_link(__MODULE__, pet, name: get_process_name(pet))
+    GenServer.start_link(__MODULE__, pet, name: get_process_name(pet.id))
   end
 
   @doc """
-  Get the current state of the pet.
+  Get the current changeset for the pet
   """
-  def get(pet) do
-    GenServer.call(get_process_name(pet), :get)
+  def changeset(pet_id) do
+    GenServer.call(get_process_name(pet_id), :changeset)
   end
 
-  def ping(pet) do
-    GenServer.cast(get_process_name(pet), {:ping})
+  def ping(pet_id) do
+    GenServer.cast(get_process_name(pet_id), {:ping})
   end
 
-  def feed(pet) do
-    GenServer.call(get_process_name(pet), :feed)
+  def feed(pet_id) do
+    GenServer.call(get_process_name(pet_id), :feed)
   end
 
-  defp get_process_name(pet) do
-    {:via, :global, "pet-#{pet.id}"}
+  defp get_process_name(pet_id) do
+    {:via, :global, "pet-#{pet_id}"}
   end
 
   ### Server process
   def init(pet) do
     Logger.info("Starting pet #{pet.id}")
     schedule_tick()
-    {:ok, {pet}}
+    {:ok, {Pets.change_pet(pet)}}
   end
 
-  def handle_info(:tick, {pet}) do
+  def handle_info(:tick, {changeset}) do
     schedule_tick()
-    pet = %{pet | age: Pet.calculate_next_age(pet), hunger: Pet.calculate_next_hunger(pet)}
 
-    pet =
+    pet = Ecto.Changeset.apply_changes(changeset)
+
+    changeset =
+      changeset
+      |> Ecto.Changeset.put_change(:age, Pet.calculate_next_age(pet))
+      |> Ecto.Changeset.put_change(:hunger, Pet.calculate_next_hunger(pet))
+
+    pet = Ecto.Changeset.apply_changes(changeset)
+
+    changeset =
       if Pet.die?(pet) do
         Logger.info("Pet #{pet.id} has died")
-        %{pet | is_alive: false}
+        Ecto.Changeset.put_change(changeset, :is_alive, false)
       else
-        pet
+        changeset
       end
+
+    pet = Ecto.Changeset.apply_changes(changeset)
 
     Registry.dispatch(Registry.PetViewers, "pet-#{pet.id}", fn entries ->
       for {pid, _} <- entries, do: send(pid, {:tick, pet})
     end)
 
-    tick_result(pet)
+    case pet do
+      %{is_alive: false} -> {:stop, :normal, {changeset}}
+      _ -> {:noreply, {changeset}}
+    end
   end
 
-  def handle_call(:get, _, {pet}) do
-    {:reply, pet, {pet}}
+  def handle_call(:changeset, _, {changeset}) do
+    {:reply, changeset, {changeset}}
   end
 
-  def handle_call(:feed, _, {pet}) do
-    {:ok, pet} = Pets.update_pet(pet, Map.from_struct(Pet.feed(pet)))
-    {:reply, pet, {pet}}
+  def handle_call(:feed, _, {changeset}) do
+    pet = Ecto.Changeset.apply_changes(changeset)
+    changeset = Ecto.Changeset.put_change(changeset, :hunger, Pet.feed(pet))
+    {:reply, Ecto.Changeset.apply_changes(changeset), {changeset}}
   end
 
-  def handle_cast({:ping}, {pet}) do
-    {:noreply, {pet}}
+  def handle_cast({:ping}, {changeset}) do
+    {:noreply, {changeset}}
   end
 
-  def terminate(reason, {pet}) do
-    Logger.info("Process for pet #{pet.id} is terminating with reason #{inspect(reason)}")
+  def terminate(reason, {changeset}) do
+    Logger.info("Process for pet is terminating with reason #{inspect(reason)}")
 
-    {Pets.get_pet!(pet.id), pet}
-    |> get_pet_changeset()
-    |> LivePet.Repo.update()
-  end
-
-  defp get_pet_changeset({stale_pet, current_pet}) do
-    Pets.change_pet(stale_pet, %{
-      age: current_pet.age,
-      hunger: current_pet.hunger,
-      is_alive: current_pet.is_alive
-    })
+    {:ok, pet} = LivePet.Repo.update(changeset)
+    Logger.info("Persisted dead pet #{pet.id}")
   end
 
   defp schedule_tick do
     Process.send_after(self(), :tick, @tick_length_in_milliseconds)
-  end
-
-  defp tick_result(%{is_alive: false} = pet) do
-    {:stop, :normal, {pet}}
-  end
-
-  defp tick_result(pet) do
-    {:noreply, {pet}}
   end
 end

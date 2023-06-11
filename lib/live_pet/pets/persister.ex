@@ -52,7 +52,6 @@ defmodule LivePet.Pets.Persister do
   defp maybe_persist(stale_pets, timestamp, total_updated) do
     {:ok, updated_pets} =
       stale_pets
-      |> Enum.map(fn stale_pet -> {stale_pet, get_current_pet_state(stale_pet)} end)
       |> Enum.map(&get_pet_changeset/1)
       |> Enum.reduce(Multi.new(), fn changeset, multi ->
         Multi.update(multi, "pet-#{changeset.data.id}", changeset)
@@ -62,8 +61,8 @@ defmodule LivePet.Pets.Persister do
     persist_pets(timestamp, total_updated + (Map.keys(updated_pets) |> length()))
   end
 
-  defp get_current_pet_state(stale_pet) do
-    Pets.Server.get(stale_pet)
+  defp get_pet_changeset(stale_pet) do
+    Pets.Server.changeset(stale_pet.id)
   end
 
   defp get_pet_changeset({stale_pet, current_pet}) do

@@ -6,7 +6,9 @@ defmodule LivePetWeb.PetLive do
   @impl true
   def mount(%{"id" => id}, _session, socket) do
     # TODO: Make sure the logged in user owns the pet
-    pet = Pets.get_pet!(id)
+    pet =
+      Pets.Server.changeset(id)
+      |> Ecto.Changeset.apply_changes()
 
     if connected?(socket) do
       register_for_updates(pet)
@@ -26,12 +28,15 @@ defmodule LivePetWeb.PetLive do
 
   @impl true
   def handle_event("ping", _, %{assigns: %{pet: pet}} = socket) do
-    Pets.Server.ping(pet)
+    Pets.Server.ping(pet.id)
     {:noreply, socket}
   end
 
   def handle_event("feed", _, %{assigns: %{pet: pet}} = socket) do
-    pet = Pets.Server.feed(pet)
+    pet =
+      Pets.Server.feed(pet.id)
+      |> Ecto.Changeset.apply_changes()
+
     {:noreply, assign_pet(socket, pet)}
   end
 
