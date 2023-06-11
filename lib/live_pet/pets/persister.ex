@@ -59,8 +59,6 @@ defmodule LivePet.Pets.Persister do
       end)
       |> Repo.transaction()
 
-    # Logger.info("Updated #{Map.keys(updated_pets) |> length()} pets")
-
     persist_pets(timestamp, total_updated + (Map.keys(updated_pets) |> length()))
   end
 

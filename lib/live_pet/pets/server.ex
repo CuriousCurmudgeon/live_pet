@@ -77,7 +77,18 @@ defmodule LivePet.Pets.Server do
 
   def terminate(reason, {pet}) do
     Logger.info("Process for pet #{pet.id} is terminating with reason #{inspect(reason)}")
-    # TODO: Persist the pet
+
+    {Pets.get_pet!(pet.id), pet}
+    |> get_pet_changeset()
+    |> LivePet.Repo.update()
+  end
+
+  defp get_pet_changeset({stale_pet, current_pet}) do
+    Pets.change_pet(stale_pet, %{
+      age: current_pet.age,
+      hunger: current_pet.hunger,
+      is_alive: current_pet.is_alive
+    })
   end
 
   defp schedule_tick do
