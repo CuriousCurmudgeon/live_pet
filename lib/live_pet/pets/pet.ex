@@ -36,6 +36,13 @@ defmodule LivePet.Pets.Pet do
     pet.age + 1
   end
 
+  @doc """
+  Should this pet die now?
+  """
+  def die?(pet) do
+    pet.age > 10_000
+  end
+
   def feed(pet) do
     %{pet | hunger: Kernel.max(pet.hunger - 100, 0)}
   end

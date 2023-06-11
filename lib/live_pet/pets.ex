@@ -56,7 +56,7 @@ defmodule LivePet.Pets do
   end
 
   defp filter_live(query) do
-    where(query, [p], p.age < 10000)
+    where(query, [p], p.is_alive)
   end
 
   @doc """

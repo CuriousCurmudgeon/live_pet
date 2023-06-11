@@ -45,6 +45,11 @@ defmodule LivePet.Pets.Server do
     schedule_tick()
     pet = %{pet | age: Pet.calculate_next_age(pet), hunger: Pet.calculate_next_hunger(pet)}
 
+    pet =
+      if Pet.die?(pet) do
+        %{pet | is_alive: false}
+      end
+
     Registry.dispatch(Registry.PetViewers, "pet-#{pet.id}", fn entries ->
       for {pid, _} <- entries, do: send(pid, {:tick, pet})
     end)
