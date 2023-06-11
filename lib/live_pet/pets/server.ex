@@ -5,7 +5,8 @@ defmodule LivePet.Pets.Server do
   state.
   """
 
-  use GenServer
+  use GenServer, restart: :transient
+  require Logger
   alias LivePet.Pets
   alias LivePet.Pets.Pet
 
@@ -37,6 +38,7 @@ defmodule LivePet.Pets.Server do
 
   ### Server process
   def init(pet) do
+    Logger.info("Starting pet #{pet.id}")
     schedule_tick()
     {:ok, {pet}}
   end
@@ -47,14 +49,17 @@ defmodule LivePet.Pets.Server do
 
     pet =
       if Pet.die?(pet) do
+        Logger.info("Pet #{pet.id} has died")
         %{pet | is_alive: false}
+      else
+        pet
       end
 
     Registry.dispatch(Registry.PetViewers, "pet-#{pet.id}", fn entries ->
       for {pid, _} <- entries, do: send(pid, {:tick, pet})
     end)
 
-    {:noreply, {pet}}
+    tick_result(pet)
   end
 
   def handle_call(:get, _, {pet}) do
@@ -70,7 +75,20 @@ defmodule LivePet.Pets.Server do
     {:noreply, {pet}}
   end
 
+  def terminate(reason, {pet}) do
+    Logger.info("Process for pet #{pet.id} is terminating with reason #{inspect(reason)}")
+    # TODO: Persist the pet
+  end
+
   defp schedule_tick do
     Process.send_after(self(), :tick, @tick_length_in_milliseconds)
+  end
+
+  defp tick_result(%{is_alive: false} = pet) do
+    {:stop, :normal, {pet}}
+  end
+
+  defp tick_result(pet) do
+    {:noreply, {pet}}
   end
 end

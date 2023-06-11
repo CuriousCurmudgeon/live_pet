@@ -24,7 +24,7 @@ defmodule LivePet.Pets.Persister do
     {:ok, new_state()}
   end
 
-  def handle_info(:persist, {timestamp}) do
+  def handle_info(:persist_stale, {timestamp}) do
     schedule_persist()
     Logger.info("Starting pet persistence")
     total_updated = persist_pets(timestamp)
@@ -39,7 +39,7 @@ defmodule LivePet.Pets.Persister do
   end
 
   defp schedule_persist do
-    Process.send_after(self(), :persist, @persist_interval_in_milliseconds)
+    Process.send_after(self(), :persist_stale, @persist_interval_in_milliseconds)
   end
 
   defp persist_pets(timestamp, total_updated \\ 0) do
