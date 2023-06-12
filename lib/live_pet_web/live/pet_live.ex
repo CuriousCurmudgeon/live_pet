@@ -6,6 +6,7 @@ defmodule LivePetWeb.PetLive do
   @impl true
   def mount(%{"id" => id}, _session, socket) do
     # TODO: Make sure the logged in user owns the pet
+    # TODO: If the pet is dead, then we won't get able to get the changeset
     pet =
       Pets.Server.changeset(id)
       |> Ecto.Changeset.apply_changes()
