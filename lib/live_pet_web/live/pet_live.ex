@@ -33,9 +33,7 @@ defmodule LivePetWeb.PetLive do
   end
 
   def handle_event("feed", _, %{assigns: %{pet: pet}} = socket) do
-    pet =
-      Pets.Server.feed(pet.id)
-      |> Ecto.Changeset.apply_changes()
+    pet = Pets.Server.feed(pet.id)
 
     {:noreply, assign_pet(socket, pet)}
   end

@@ -64,12 +64,4 @@ defmodule LivePet.Pets.Persister do
   defp get_pet_changeset(stale_pet) do
     Pets.Server.changeset(stale_pet.id)
   end
-
-  defp get_pet_changeset({stale_pet, current_pet}) do
-    Pets.change_pet(stale_pet, %{
-      age: current_pet.age,
-      hunger: current_pet.hunger,
-      is_alive: current_pet.is_alive
-    })
-  end
 end

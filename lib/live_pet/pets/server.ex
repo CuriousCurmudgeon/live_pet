@@ -80,8 +80,7 @@ defmodule LivePet.Pets.Server do
   end
 
   def handle_call(:feed, _, {changeset}) do
-    pet = Ecto.Changeset.apply_changes(changeset)
-    changeset = Ecto.Changeset.put_change(changeset, :hunger, Pet.feed(pet))
+    changeset = Pet.feed(changeset)
     {:reply, Ecto.Changeset.apply_changes(changeset), {changeset}}
   end
 

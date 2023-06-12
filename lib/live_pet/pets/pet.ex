@@ -44,9 +44,11 @@ defmodule LivePet.Pets.Pet do
   end
 
   @doc """
-  Calculate the hunger after feeding
+  Feed the pet represented by the changeset and return an updated changeset
   """
-  def feed(pet) do
-    Kernel.max(pet.hunger - 100, 0)
+  def feed(%Ecto.Changeset{} = changeset) do
+    {_, current_hunger} = Ecto.Changeset.fetch_field(changeset, :hunger)
+
+    Ecto.Changeset.put_change(changeset, :hunger, Kernel.max(current_hunger - 100, 0))
   end
 end
