@@ -21,26 +21,29 @@ defmodule LivePet.Pets.Pet do
   end
 
   @doc """
-  Calculate the pet's next hunger. Typically, this will be called on
-  every tick.
+  Increment the hunger for the pet represented by the changeset.
   """
-  def calculate_next_hunger(pet) do
-    pet.hunger + 1
+  def increment_hunger(%Ecto.Changeset{} = changeset) do
+    {_, current_hunger} = Ecto.Changeset.fetch_field(changeset, :hunger)
+
+    Ecto.Changeset.put_change(changeset, :hunger, current_hunger + 1)
   end
 
   @doc """
-  Calculate the pet's next age. Typically, this will be called on
-  every tick.
+  Increment the age for the pet represented by the changeset.
   """
-  def calculate_next_age(pet) do
-    pet.age + 1
+  def increment_age(%Ecto.Changeset{} = changeset) do
+    {_, current_age} = Ecto.Changeset.fetch_field(changeset, :age)
+
+    Ecto.Changeset.put_change(changeset, :age, current_age + 1)
   end
 
   @doc """
-  Should this pet die now?
+  Should the pet repsented by the changeset die now?
   """
-  def die?(pet) do
-    pet.age > 10_000
+  def die?(%Ecto.Changeset{} = changeset) do
+    {_, current_age} = Ecto.Changeset.fetch_field(changeset, :age)
+    current_age > 10_000
   end
 
   @doc """

@@ -50,14 +50,11 @@ defmodule LivePet.Pets.Server do
 
     changeset =
       changeset
-      |> Ecto.Changeset.put_change(:age, Pet.calculate_next_age(pet))
-      |> Ecto.Changeset.put_change(:hunger, Pet.calculate_next_hunger(pet))
-
-    pet = Ecto.Changeset.apply_changes(changeset)
+      |> Pet.increment_age()
+      |> Pet.increment_hunger()
 
     changeset =
-      if Pet.die?(pet) do
-        Logger.info("Pet #{pet.id} has died")
+      if Pet.die?(changeset) do
         Ecto.Changeset.put_change(changeset, :is_alive, false)
       else
         changeset
@@ -70,8 +67,12 @@ defmodule LivePet.Pets.Server do
     end)
 
     case pet do
-      %{is_alive: false} -> {:stop, :normal, {changeset}}
-      _ -> {:noreply, {changeset}}
+      %{is_alive: false} ->
+        Logger.info("Pet #{pet.id} has died")
+        {:stop, :normal, {changeset}}
+
+      _ ->
+        {:noreply, {changeset}}
     end
   end
 
