@@ -30,10 +30,8 @@ defmodule LivePet.PetSupervisor do
   end
 
   def start_pet_server(pet) do
-    %{active: partition_count} = PartitionSupervisor.count_children(__MODULE__)
-
     case DynamicSupervisor.start_child(
-           {:via, PartitionSupervisor, {__MODULE__, :rand.uniform(partition_count)}},
+           __MODULE__,
            {Pets.Server, pet}
          ) do
       {:ok, pid} ->
