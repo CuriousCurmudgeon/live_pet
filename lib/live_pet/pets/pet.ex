@@ -16,6 +16,7 @@ defmodule LivePet.Pets.Pet do
   def changeset(pet, attrs) do
     pet
     |> cast(attrs, [:name, :age, :hunger, :user_id, :is_alive])
+    |> validate_length(:name, min: 3, max: 100)
     |> validate_required([:name, :age, :hunger, :user_id])
     |> validate_number(:hunger, greater_than_or_equal_to: 0)
   end
