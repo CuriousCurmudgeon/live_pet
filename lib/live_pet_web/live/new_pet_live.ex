@@ -6,9 +6,8 @@ defmodule LivePetWeb.NewPetLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    pet = %Pet{}
-    changeset = Pets.change_pet(pet)
-    {:ok, socket |> assign(:pet, pet) |> assign_form(changeset)}
+    changeset = Pets.change_pet(%Pet{})
+    {:ok, socket |> assign_form(changeset)}
   end
 
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do
