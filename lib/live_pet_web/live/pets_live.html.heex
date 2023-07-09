@@ -7,9 +7,9 @@
   </:actions>
 </.header>
 
-<.table id="pets" rows={@pets}>
+<.table id="pets" rows={@pets} row_click={fn pet -> JS.navigate(~p"/pet/#{pet}") end}>
   <:col :let={pet} label="Name">
-    <.link navigate={~p"/pet/#{pet.id}"}><%= pet.name %></.link>
+    <%= pet.name %>
   </:col>
   <:col :let={pet} label="Birth Date">
     <%= Calendar.strftime(pet.inserted_at, "%x") %>
