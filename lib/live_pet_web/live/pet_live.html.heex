@@ -1,2 +1,12 @@
-<.header><%= @pet.name %></.header>
-<img class="w-64" src={@pet.image} />
+<div class="grid grid-cols-2 gap-6">
+  <div class="col-span-1 text-center">
+    <img class="w-auto" src={@pet.image} />
+  </div>
+  <div>
+    <.header><%= @pet.name %></.header>
+    <.list>
+      <:item title="Age"><%= @pet.age %></:item>
+      <:item title="Hunger"><%= @pet.hunger %></:item>
+    </.list>
+  </div>
+</div>
