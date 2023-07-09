@@ -10,6 +10,19 @@ defmodule LivePet.Pets do
   alias LivePet.Pets.Pet
 
   @doc """
+  Returns a list of all pet types
+
+  ## Examples
+
+      iex> list_pet_types()
+      ["cat", "crab", ...]
+
+  """
+  def list_pet_types do
+    ["cat", "crab", "dog", "fish", "fox", "phoenix", "rabbit", "sea_turtle", "totoro"]
+  end
+
+  @doc """
   Returns the list of pets.
 
   ## Examples

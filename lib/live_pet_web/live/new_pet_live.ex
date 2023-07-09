@@ -46,8 +46,7 @@ defmodule LivePetWeb.NewPetLive do
   end
 
   defp assign_images(socket) do
-    {:ok, images} = File.ls("priv/static/images/pets")
-    assign(socket, :images, images |> Enum.map(&pet_image_path/1))
+    assign(socket, :images, Pets.list_pet_types() |> Enum.map(&pet_image_path/1))
   end
 
   defp assign_selected_image(socket, image) do
@@ -59,7 +58,7 @@ defmodule LivePetWeb.NewPetLive do
     |> Map.put("user_id", current_user.id)
   end
 
-  defp pet_image_path(image) do
-    ~p"/images/pets/#{image}"
+  defp pet_image_path(type) do
+    ~p"/images/pets/#{type <> ".jpg"}"
   end
 end
