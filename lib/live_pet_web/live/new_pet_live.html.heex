@@ -3,6 +3,12 @@
 <.simple_form for={@form} id="pet_form" phx-submit="save" phx-change="validate">
   <.input field={@form[:name]} type="text" label="Name" required />
 
+  <ul role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <li :for={image <- @images} class="col-span-1">
+      <img src={~p"/images/pets/#{image}"} />
+    </li>
+  </ul>
+
   <:actions>
     <.button phx-disable-with="Creating pet..." class="w-full">
       Create Pet <span aria-hidden="true">→</span>
