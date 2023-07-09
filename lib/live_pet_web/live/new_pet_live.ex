@@ -37,17 +37,26 @@ defmodule LivePetWeb.NewPetLive do
     {:noreply, assign_form(socket, changeset)}
   end
 
+  def handle_event("select_image", %{"image" => image}, socket) do
+    IO.inspect(image)
+    {:noreply, socket}
+  end
+
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do
     assign(socket, :form, to_form(changeset))
   end
 
   defp assign_images(socket) do
     {:ok, images} = File.ls("priv/static/images/pets")
-    assign(socket, :images, images)
+    assign(socket, :images, images |> Enum.map(&pet_image_path/1))
   end
 
   defp params_with_user_id(params, %{assigns: %{current_user: current_user}}) do
     params
     |> Map.put("user_id", current_user.id)
+  end
+
+  defp pet_image_path(image) do
+    ~p"/images/pets/#{image}"
   end
 end

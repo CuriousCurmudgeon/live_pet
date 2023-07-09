@@ -4,8 +4,13 @@
   <.input field={@form[:name]} type="text" label="Name" required />
 
   <ul role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-    <li :for={image <- @images} class="col-span-1">
-      <img src={~p"/images/pets/#{image}"} />
+    <li
+      :for={image <- @images}
+      class="col-span-1"
+      phx-click="select_image"
+      phx-value-image={image}
+    >
+      <img src={image} />
     </li>
   </ul>
 
