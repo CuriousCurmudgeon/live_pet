@@ -9,7 +9,7 @@ defmodule LivePetWeb.NewPetLive do
   @impl true
   def mount(_params, _session, socket) do
     changeset = Pets.change_pet(%Pet{})
-    {:ok, socket |> assign_images() |> assign_form(changeset)}
+    {:ok, socket |> assign_images() |> assign_selected_image(nil) |> assign_form(changeset)}
   end
 
   @impl true
@@ -38,8 +38,7 @@ defmodule LivePetWeb.NewPetLive do
   end
 
   def handle_event("select_image", %{"image" => image}, socket) do
-    IO.inspect(image)
-    {:noreply, socket}
+    {:noreply, assign_selected_image(socket, image)}
   end
 
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do
@@ -49,6 +48,10 @@ defmodule LivePetWeb.NewPetLive do
   defp assign_images(socket) do
     {:ok, images} = File.ls("priv/static/images/pets")
     assign(socket, :images, images |> Enum.map(&pet_image_path/1))
+  end
+
+  defp assign_selected_image(socket, image) do
+    assign(socket, :selected_image, image)
   end
 
   defp params_with_user_id(params, %{assigns: %{current_user: current_user}}) do
