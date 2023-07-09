@@ -14,6 +14,9 @@
   <:col :let={pet} label="Birth Date">
     <%= Calendar.strftime(pet.inserted_at, "%x") %>
   </:col>
+  <:col :let={pet} label="Status">
+    <span class="text-4xl"><%= if pet.is_alive, do: "🆗", else: "☠️" %></span>
+  </:col>
   <:col :let={pet}>
     <img class="w-16" src={pet.image} />
   </:col>
