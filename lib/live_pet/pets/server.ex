@@ -42,15 +42,13 @@ defmodule LivePet.Pets.Server do
 
   ### Server process
   def init(pet) do
-    Logger.info("Starting pet #{pet.id}")
+    Logger.debug("Starting pet #{pet.id}")
     schedule_tick()
-    {:ok, {Pets.change_pet(pet)}}
+    {:ok, Pets.change_pet(pet)}
   end
 
-  def handle_info(:tick, {changeset}) do
+  def handle_info(:tick, changeset) do
     schedule_tick()
-
-    pet = Ecto.Changeset.apply_changes(changeset)
 
     changeset =
       changeset
@@ -73,23 +71,23 @@ defmodule LivePet.Pets.Server do
     case pet do
       %{is_alive: false} ->
         Logger.info("Pet #{pet.id} has died")
-        {:stop, :normal, {changeset}}
+        {:stop, :normal, changeset}
 
       _ ->
-        {:noreply, {changeset}}
+        {:noreply, changeset}
     end
   end
 
-  def handle_call(:changeset, _, {changeset}) do
-    {:reply, changeset, {changeset}}
+  def handle_call(:changeset, _, changeset) do
+    {:reply, changeset, changeset}
   end
 
-  def handle_call(:feed, _, {changeset}) do
+  def handle_call(:feed, _, changeset) do
     changeset = Pet.feed(changeset)
-    {:reply, Ecto.Changeset.apply_changes(changeset), {changeset}}
+    {:reply, Ecto.Changeset.apply_changes(changeset), changeset}
   end
 
-  def terminate(reason, {changeset}) do
+  def terminate(reason, changeset) do
     Logger.info("Process for pet is terminating with reason #{inspect(reason)}")
 
     {:ok, pet} = LivePet.Repo.update(changeset)
