@@ -33,7 +33,7 @@ defmodule LivePet.Pets do
   def list_pets_for_user(user) do
     Pet
     |> where([p], p.user_id == ^user.id)
-    |> order_by(:name)
+    |> order_by(desc: :inserted_at)
     |> Repo.all()
   end
 
