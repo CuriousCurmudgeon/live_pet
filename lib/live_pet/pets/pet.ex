@@ -3,8 +3,9 @@ defmodule LivePet.Pets.Pet do
   import Ecto.Changeset
 
   schema "pets" do
-    field :age, :integer, default: 0
     field :name, :string
+    field :image, :string
+    field :age, :integer, default: 0
     field :hunger, :integer, default: 0
     field :is_alive, :boolean, default: true
     belongs_to :user, LivePet.Accounts.User
@@ -15,9 +16,10 @@ defmodule LivePet.Pets.Pet do
   @doc false
   def changeset(pet, attrs) do
     pet
-    |> cast(attrs, [:name, :age, :hunger, :user_id, :is_alive])
-    |> validate_length(:name, min: 3, max: 100)
+    |> cast(attrs, [:name, :image, :age, :hunger, :user_id, :is_alive])
     |> validate_required([:name, :age, :hunger, :user_id])
+    |> validate_required([:image], message: "Please choose an image")
+    |> validate_length(:name, min: 3, max: 100)
     |> validate_number(:hunger, greater_than_or_equal_to: 0)
   end
 
