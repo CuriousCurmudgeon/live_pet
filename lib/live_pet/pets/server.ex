@@ -32,10 +32,6 @@ defmodule LivePet.Pets.Server do
     GenServer.call(get_process_name(pet_id), :changeset)
   end
 
-  def ping(pet_id) do
-    GenServer.cast(get_process_name(pet_id), {:ping})
-  end
-
   def feed(pet_id) do
     GenServer.call(get_process_name(pet_id), :feed)
   end
@@ -91,10 +87,6 @@ defmodule LivePet.Pets.Server do
   def handle_call(:feed, _, {changeset}) do
     changeset = Pet.feed(changeset)
     {:reply, Ecto.Changeset.apply_changes(changeset), {changeset}}
-  end
-
-  def handle_cast({:ping}, {changeset}) do
-    {:noreply, {changeset}}
   end
 
   def terminate(reason, {changeset}) do
