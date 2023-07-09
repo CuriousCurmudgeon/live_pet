@@ -8,8 +8,11 @@
 </.header>
 
 <.table id="pets" rows={@pets}>
-  <:col :let={pet} label="name">
+  <:col :let={pet} label="Name">
     <.link navigate={~p"/pet/#{pet.id}"}><%= pet.name %></.link>
+  </:col>
+  <:col :let={pet} label="Birth Date">
+    <%= Calendar.strftime(pet.inserted_at, "%x") %>
   </:col>
   <:col :let={pet}>
     <img class="w-16" src={pet.image} />
