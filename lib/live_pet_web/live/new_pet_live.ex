@@ -9,7 +9,7 @@ defmodule LivePetWeb.NewPetLive do
   @impl true
   def mount(_params, _session, socket) do
     changeset = Pets.change_pet(%Pet{})
-    {:ok, socket |> assign_form(changeset)}
+    {:ok, socket |> assign_images() |> assign_form(changeset)}
   end
 
   @impl true
@@ -39,6 +39,11 @@ defmodule LivePetWeb.NewPetLive do
 
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do
     assign(socket, :form, to_form(changeset))
+  end
+
+  defp assign_images(socket) do
+    {:ok, images} = File.ls("priv/static/images/pets")
+    assign(socket, :images, images)
   end
 
   defp params_with_user_id(params, %{assigns: %{current_user: current_user}}) do
