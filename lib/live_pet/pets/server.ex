@@ -18,6 +18,14 @@ defmodule LivePet.Pets.Server do
   end
 
   @doc """
+  Get the current state of the pet
+  """
+  def pet(pet_id) do
+    GenServer.call(get_process_name(pet_id), :changeset)
+    |> Ecto.Changeset.apply_changes()
+  end
+
+  @doc """
   Get the current changeset for the pet
   """
   def changeset(pet_id) do
