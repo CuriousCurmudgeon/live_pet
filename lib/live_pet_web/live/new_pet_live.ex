@@ -28,6 +28,15 @@ defmodule LivePetWeb.NewPetLive do
     end
   end
 
+  def handle_event("validate", %{"pet" => pet_params}, socket) do
+    changeset =
+      %Pet{}
+      |> Pets.change_pet(pet_params)
+      |> Map.put(:action, :validate)
+
+    {:noreply, assign_form(socket, changeset)}
+  end
+
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do
     assign(socket, :form, to_form(changeset))
   end

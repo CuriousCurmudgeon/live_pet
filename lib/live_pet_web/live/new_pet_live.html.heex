@@ -1,6 +1,6 @@
 <.header>New Pet</.header>
 
-<.simple_form for={@form} id="pet_form" phx-submit="save">
+<.simple_form for={@form} id="pet_form" phx-submit="save" phx-change="validate">
   <.input field={@form[:name]} type="text" label="Name" required />
 
   <:actions>
