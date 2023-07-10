@@ -8,7 +8,7 @@ defmodule LivePetWeb.PetLive do
   def mount(%{"id" => id}, _session, socket) do
     current_user_id = socket.assigns.current_user.id
 
-    case Pets.Server.pet(id) do
+    case Pets.Simulation.pet(id) do
       # Current user owns pet
       {:ok, %Pet{user_id: ^current_user_id} = pet} ->
         if connected?(socket) do

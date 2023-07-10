@@ -1,4 +1,4 @@
-defmodule LivePet.Pets.Server do
+defmodule LivePet.Pets.Simulation do
   @moduledoc """
   GenServer implementation of a pet. Updates the pet state on
   every tick and accepts messages to interact with it and get it's current

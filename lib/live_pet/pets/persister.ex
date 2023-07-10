@@ -62,7 +62,7 @@ defmodule LivePet.Pets.Persister do
   end
 
   defp get_pet_changeset(stale_pet) do
-    {:ok, changeset} = Pets.Server.changeset(stale_pet.id)
+    {:ok, changeset} = Pets.Simulation.changeset(stale_pet.id)
     changeset
   end
 end

@@ -32,7 +32,7 @@ defmodule LivePet.PetSupervisor do
   def start_pet_server(pet) do
     case DynamicSupervisor.start_child(
            __MODULE__,
-           {Pets.Server, pet}
+           {Pets.Simulation, pet}
          ) do
       {:ok, pid} ->
         pid
