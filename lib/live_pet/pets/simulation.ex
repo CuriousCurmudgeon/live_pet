@@ -24,16 +24,16 @@ defmodule LivePet.Pets.Simulation do
 
   ## Examples
 
-      iex> pet(123)
+      iex> get_pet(123)
       {:ok, %Pet{}}
 
-      iex> pet(456)
+      iex> get_pet(456)
       {:error, :dead, %Pet{}}
 
-      iex> pet(789)
+      iex> get_pet(789)
       {:error, :not_found}
   """
-  def pet(pet_id) do
+  def get_pet(pet_id) do
     process_name = get_process_name(pet_id)
 
     case GenServer.whereis(process_name) do
@@ -41,37 +41,7 @@ defmodule LivePet.Pets.Simulation do
         get_pet_error(pet_id)
 
       pid ->
-        {:ok,
-         GenServer.call(pid, :changeset)
-         |> Ecto.Changeset.apply_changes()}
-    end
-  end
-
-  @doc """
-  Get the current changeset for the pet
-
-  Returns an error tuple if the pet is not found or is dead
-
-  ## Examples
-
-      iex> changeset(123)
-      {:ok, %Pet{}}
-
-      iex> changeset(456)
-      {:error, :dead, %Pet{}}
-
-      iex> changeset(789)
-      {:error, :not_found}
-  """
-  def changeset(pet_id) do
-    process_name = get_process_name(pet_id)
-
-    case GenServer.whereis(process_name) do
-      nil ->
-        get_pet_error(pet_id)
-
-      pid ->
-        {:ok, GenServer.call(pid, :changeset)}
+        {:ok, GenServer.call(pid, :get_pet)}
     end
   end
 
@@ -118,14 +88,14 @@ defmodule LivePet.Pets.Simulation do
   def init(pet) do
     Logger.debug("Starting pet #{pet.id}")
     schedule_tick()
-    {:ok, Pets.change_pet(pet)}
+    {:ok, pet}
   end
 
-  def handle_info(:tick, changeset) do
+  def handle_info(:tick, pet) do
     schedule_tick()
 
     changeset =
-      changeset
+      Pets.change_pet(pet)
       |> Pet.increment_age()
       |> Pet.increment_hunger()
 
@@ -145,26 +115,29 @@ defmodule LivePet.Pets.Simulation do
     case pet do
       %{is_alive: false} ->
         Logger.info("Pet #{pet.id} has died")
-        {:stop, :normal, changeset}
+        {:stop, :normal, pet}
 
       _ ->
-        {:noreply, changeset}
+        {:noreply, pet}
     end
   end
 
-  def handle_call(:changeset, _, changeset) do
-    {:reply, changeset, changeset}
+  def handle_call(:get_pet, _, pet) do
+    {:reply, pet, pet}
   end
 
-  def handle_call(:feed, _, changeset) do
-    changeset = Pet.feed(changeset)
-    {:reply, Ecto.Changeset.apply_changes(changeset), changeset}
+  def handle_call(:feed, _, pet) do
+    pet = Pets.change_pet(pet) |> Pet.feed() |> Ecto.Changeset.apply_changes()
+    {:reply, pet, pet}
   end
 
-  def terminate(reason, changeset) do
+  def terminate(reason, pet) do
     Logger.info("Process for pet is terminating with reason #{inspect(reason)}")
 
-    {:ok, pet} = LivePet.Repo.update(changeset)
+    {:ok, pet} =
+      Pets.get_pet(pet.id)
+      |> Pets.update_pet(Map.from_struct(pet))
+
     Logger.info("Persisted dead pet #{pet.id}")
   end
 

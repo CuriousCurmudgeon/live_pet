@@ -61,8 +61,10 @@ defmodule LivePet.Pets.Persister do
     persist_pets(timestamp, total_updated + (Map.keys(updated_pets) |> length()))
   end
 
-  defp get_pet_changeset(stale_pet) do
-    {:ok, changeset} = Pets.Simulation.changeset(stale_pet.id)
-    changeset
+  defp get_pet_changeset(pet) do
+    {:ok, simulated_pet} = Pets.Simulation.get_pet(pet.id)
+
+    Pets.get_pet(pet.id)
+    |> Pets.change_pet(Map.from_struct(simulated_pet))
   end
 end
