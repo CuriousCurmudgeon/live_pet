@@ -9,17 +9,29 @@ defmodule LivePetWeb.PetLive do
     current_user_id = socket.assigns.current_user.id
 
     case Pets.Server.pet(id) do
-      %Pet{user_id: ^current_user_id} = pet ->
+      # Current user owns pet
+      {:ok, %Pet{user_id: ^current_user_id} = pet} ->
         if connected?(socket) do
           register_for_updates(pet)
         end
 
         {:ok, assign_pet(socket, pet)}
 
-      _ ->
+      # Current user does not own pet
+      {:ok, _} ->
         {:ok,
          socket
          |> put_flash(:error, "You do not have permission to view that pet")
+         |> redirect(to: ~p"/pets")}
+
+      {:error, :dead, %Pet{} = pet} ->
+        {:ok, assign_pet(socket, pet)}
+
+      # The pet server was not found
+      {:error, :not_found} ->
+        {:ok,
+         socket
+         |> put_flash(:error, "Pet not found")
          |> redirect(to: ~p"/pets")}
     end
   end

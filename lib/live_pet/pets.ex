@@ -89,6 +89,22 @@ defmodule LivePet.Pets do
   def get_pet!(id), do: Repo.get!(Pet, id)
 
   @doc """
+  Gets a single pet.
+
+  Returns nil if pet does not exist
+
+  ## Examples
+
+      iex> get_pet(123)
+      %Pet{}
+
+      iex> get_pet(456)
+      nil
+
+  """
+  def get_pet(id), do: Repo.get(Pet, id)
+
+  @doc """
   Creates a pet.
 
   ## Examples

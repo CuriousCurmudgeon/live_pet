@@ -19,10 +19,39 @@ defmodule LivePet.Pets.Server do
 
   @doc """
   Get the current state of the pet
+
+  Returns an error tuple if the pet is not found or is dead
+
+  ## Examples
+
+      iex> pet(123)
+      {:ok, %Pet{}}
+
+      iex> pet(456)
+      {:error, :dead, %Pet{}}
+
+      iex> pet(789)
+      {:error, :not_found}
   """
   def pet(pet_id) do
-    GenServer.call(get_process_name(pet_id), :changeset)
-    |> Ecto.Changeset.apply_changes()
+    process_name = get_process_name(pet_id)
+
+    case GenServer.whereis(process_name) do
+      nil ->
+        get_pet_error(pet_id)
+
+      pid ->
+        {:ok,
+         GenServer.call(pid, :changeset)
+         |> Ecto.Changeset.apply_changes()}
+    end
+  end
+
+  defp get_pet_error(pet_id) do
+    case Pets.get_pet(pet_id) do
+      %Pet{is_alive: false} = pet -> {:error, :dead, pet}
+      nil -> {:error, :not_found}
+    end
   end
 
   @doc """
