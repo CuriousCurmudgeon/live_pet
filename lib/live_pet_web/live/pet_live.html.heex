@@ -11,4 +11,6 @@
   </div>
 </div>
 
-<.button phx-click="feed" class="ml-2">Feed!</.button>
+<div :if={@pet.is_alive}>
+  <.button phx-click="feed" class="ml-2">Feed!</.button>
+</div>
