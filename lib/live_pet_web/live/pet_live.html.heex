@@ -3,14 +3,15 @@
     <img class="w-auto" src={@pet.image} />
   </div>
   <div>
-    <.header><%= @pet.name %> <span :if={!@pet.is_alive}>☠️</span></.header>
+    <.header>
+      <%= @pet.name %> <span :if={!@pet.is_alive}>☠️</span>
+      <:actions :if={@pet.is_alive}>
+        <.button phx-click="feed">Feed 🍎</.button>
+      </:actions>
+    </.header>
     <.list>
       <:item title="Age"><%= @pet.age %></:item>
       <:item title="Hunger"><%= @pet.hunger %></:item>
     </.list>
   </div>
-</div>
-
-<div :if={@pet.is_alive}>
-  <.button phx-click="feed" class="ml-2">Feed!</.button>
 </div>
