@@ -96,7 +96,7 @@ defmodule LivePet.Pets.Simulation do
     pet = simulate_tick(pet)
 
     Registry.dispatch(Registry.PetViewers, "pet-#{pet.id}", fn entries ->
-      for {pid, _} <- entries, do: send(pid, {:tick, pet})
+      for {pid, _} <- entries, do: send(pid, {:update, pet})
     end)
 
     case pet do

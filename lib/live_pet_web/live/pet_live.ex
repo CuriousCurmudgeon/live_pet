@@ -37,7 +37,7 @@ defmodule LivePetWeb.PetLive do
   end
 
   @impl true
-  def handle_info({:tick, pet}, socket) do
+  def handle_info({:update, pet}, socket) do
     {:noreply, assign_pet(socket, pet)}
   end
 
