@@ -93,11 +93,10 @@ defmodule LivePet.Pets.Simulation do
 
   def handle_info(:tick, pet) do
     schedule_tick()
-    pet = simulate_tick(pet)
 
-    Registry.dispatch(Registry.PetViewers, "pet-#{pet.id}", fn entries ->
-      for {pid, _} <- entries, do: send(pid, {:update, pet})
-    end)
+    pet =
+      simulate_tick(pet)
+      |> update_viewers()
 
     case pet do
       %{is_alive: false} ->
@@ -146,5 +145,13 @@ defmodule LivePet.Pets.Simulation do
     else
       changeset
     end
+  end
+
+  defp update_viewers(pet) do
+    Registry.dispatch(Registry.PetViewers, "pet-#{pet.id}", fn entries ->
+      for {pid, _} <- entries, do: send(pid, {:update, pet})
+    end)
+
+    pet
   end
 end
