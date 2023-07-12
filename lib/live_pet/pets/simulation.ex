@@ -93,20 +93,7 @@ defmodule LivePet.Pets.Simulation do
 
   def handle_info(:tick, pet) do
     schedule_tick()
-
-    changeset =
-      Pets.change_pet(pet)
-      |> Pet.increment_age()
-      |> Pet.increment_hunger()
-
-    changeset =
-      if Pet.die?(changeset) do
-        Ecto.Changeset.put_change(changeset, :is_alive, false)
-      else
-        changeset
-      end
-
-    pet = Ecto.Changeset.apply_changes(changeset)
+    pet = simulate_tick(pet)
 
     Registry.dispatch(Registry.PetViewers, "pet-#{pet.id}", fn entries ->
       for {pid, _} <- entries, do: send(pid, {:tick, pet})
@@ -143,5 +130,21 @@ defmodule LivePet.Pets.Simulation do
 
   defp schedule_tick do
     Process.send_after(self(), :tick, @tick_length_in_milliseconds)
+  end
+
+  defp simulate_tick(pet) do
+    Pets.change_pet(pet)
+    |> Pet.increment_age()
+    |> Pet.increment_hunger()
+    |> maybe_die()
+    |> Ecto.Changeset.apply_changes()
+  end
+
+  defp maybe_die(changeset) do
+    if Pet.die?(changeset) do
+      Ecto.Changeset.put_change(changeset, :is_alive, false)
+    else
+      changeset
+    end
   end
 end
