@@ -46,31 +46,15 @@ defmodule LivePet.Pets.Simulation do
   end
 
   @doc """
-  Feed the pet
-
-  Returns an error tuple if the pet is not found or is dead
+  Feed the pet. Updates all viewers with new pet state.
 
   ## Examples
 
       iex> feed(123)
-      {:ok, %Pet{}}
-
-      iex> feed(456)
-      {:error, :dead, %Pet{}}
-
-      iex> feed(789)
-      {:error, :not_found}
+      :ok
   """
   def feed(pet_id) do
-    process_name = get_process_name(pet_id)
-
-    case GenServer.whereis(process_name) do
-      nil ->
-        get_pet_error(pet_id)
-
-      pid ->
-        {:ok, GenServer.call(pid, :feed)}
-    end
+    GenServer.cast(get_process_name(pet_id), :feed)
   end
 
   defp get_process_name(pet_id) do
@@ -112,9 +96,9 @@ defmodule LivePet.Pets.Simulation do
     {:reply, pet, pet}
   end
 
-  def handle_call(:feed, _, pet) do
-    pet = Pets.change_pet(pet) |> Pet.feed() |> Ecto.Changeset.apply_changes()
-    {:reply, pet, pet}
+  def handle_cast(:feed, pet) do
+    {:noreply,
+     Pets.change_pet(pet) |> Pet.feed() |> Ecto.Changeset.apply_changes() |> update_viewers()}
   end
 
   def terminate(reason, pet) do

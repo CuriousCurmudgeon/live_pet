@@ -41,6 +41,13 @@ defmodule LivePetWeb.PetLive do
     {:noreply, assign_pet(socket, pet)}
   end
 
+  @impl true
+  def handle_event("feed", _, %{assigns: %{pet: pet}} = socket) do
+    Pets.Simulation.feed(pet.id)
+
+    {:noreply, socket}
+  end
+
   defp register_for_updates(pet) do
     {:ok, _} = Registry.register(Registry.PetViewers, "pet-#{pet.id}", [])
   end
