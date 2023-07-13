@@ -29,7 +29,7 @@ defmodule LivePet.Pets.Pet do
   def increment_hunger(%Ecto.Changeset{} = changeset) do
     {_, current_hunger} = Ecto.Changeset.fetch_field(changeset, :hunger)
 
-    Ecto.Changeset.put_change(changeset, :hunger, current_hunger + 1)
+    Ecto.Changeset.put_change(changeset, :hunger, Kernel.min(current_hunger + 5, 500))
   end
 
   @doc """

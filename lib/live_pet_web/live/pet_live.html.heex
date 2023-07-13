@@ -10,6 +10,8 @@
   </div>
   <.list>
     <:item title="Age"><%= @pet.age %></:item>
-    <:item title="Hunger"><%= @pet.hunger %></:item>
+    <:item title="Hunger">
+      <LivePetWeb.PetComponents.hearts class="text-2xl" hunger={@pet.hunger} />
+    </:item>
   </.list>
 </div>
