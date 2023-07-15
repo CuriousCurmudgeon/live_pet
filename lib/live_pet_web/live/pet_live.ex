@@ -3,6 +3,7 @@ defmodule LivePetWeb.PetLive do
 
   alias LivePet.Pets
   alias LivePet.Pets.Pet
+  alias LivePetWeb.Presence
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
@@ -37,6 +38,12 @@ defmodule LivePetWeb.PetLive do
   end
 
   @impl true
+  def handle_params(_params, _uri, socket) do
+    maybe_track_pet(socket)
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_info({:update, pet}, socket) do
     {:noreply, assign_pet(socket, pet)}
   end
@@ -50,6 +57,12 @@ defmodule LivePetWeb.PetLive do
 
   defp register_for_updates(pet) do
     {:ok, _} = Registry.register(Registry.PetViewers, "pet-#{pet.id}", [])
+  end
+
+  defp maybe_track_pet(%{assigns: %{pet: pet}} = socket) do
+    if connected?(socket) do
+      Presence.track_pet(self(), pet)
+    end
   end
 
   defp assign_pet(socket, pet) do
