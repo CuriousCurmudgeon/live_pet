@@ -16,7 +16,7 @@ defmodule LivePetWeb.Pet.PetLive do
           register_for_updates(pet)
         end
 
-        {:ok, assign_pet(socket, pet)}
+        {:ok, socket |> assign_pet(pet) |> assign(:active_pets_component_id, "active-pets")}
 
       # Current user does not own pet
       {:ok, _} ->
@@ -59,11 +59,13 @@ defmodule LivePetWeb.Pet.PetLive do
     {:ok, _} = Registry.register(Registry.PetViewers, "pet-#{pet.id}", [])
   end
 
-  defp maybe_track_pet(%{assigns: %{pet: pet}} = socket) do
+  defp maybe_track_pet(%{assigns: %{pet: %Pet{is_alive: true} = pet}} = socket) do
     if connected?(socket) do
       Presence.track_pet(self(), pet)
     end
   end
+
+  defp maybe_track_pet(_socket), do: nil
 
   defp assign_pet(socket, pet) do
     assign(socket, :pet, pet)
