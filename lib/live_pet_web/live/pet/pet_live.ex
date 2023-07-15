@@ -1,4 +1,4 @@
-defmodule LivePetWeb.PetLive do
+defmodule LivePetWeb.Pet.PetLive do
   use LivePetWeb, :live_view
 
   alias LivePet.Pets

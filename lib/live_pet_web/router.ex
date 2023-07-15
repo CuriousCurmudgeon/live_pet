@@ -71,7 +71,7 @@ defmodule LivePetWeb.Router do
 
       live "/pets", PetsLive
       live "/pets/new", NewPetLive
-      live "/pet/:id", PetLive
+      live "/pet/:id", Pet.PetLive
     end
   end
 
