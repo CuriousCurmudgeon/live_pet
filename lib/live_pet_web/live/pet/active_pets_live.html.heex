@@ -1,1 +1,3 @@
-<p>Active pets go here</p>
+<ul>
+  <li :for={pet <- @active_pets}><%= pet.name %></li>
+</ul>

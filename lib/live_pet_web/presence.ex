@@ -18,5 +18,11 @@ defmodule LivePetWeb.Presence do
 
   def list_active_pets do
     Presence.list(@active_pet_topic)
+    |> Enum.map(&extract_pets/1)
+  end
+
+  defp extract_pets({_pet_id, %{metas: metas}}) do
+    %{pet: pet} = List.first(metas)
+    pet
   end
 end
