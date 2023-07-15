@@ -2,6 +2,7 @@ defmodule LivePetWeb.Pet.ActivePetsLive do
   use LivePetWeb, :live_component
   alias LivePetWeb.Presence
 
+  @impl true
   def update(assigns, socket) do
     {:ok, socket |> assign_pet(assigns.pet) |> assign_active_pets()}
   end

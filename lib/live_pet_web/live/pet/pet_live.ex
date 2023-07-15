@@ -56,6 +56,11 @@ defmodule LivePetWeb.Pet.PetLive do
     {:noreply, socket}
   end
 
+  def handle_event("camping_request", %{"pet_id" => pet_id}, socket) do
+    IO.inspect(pet_id)
+    {:noreply, socket}
+  end
+
   defp register_for_updates(pet) do
     {:ok, _} = Registry.register(Registry.PetViewers, "pet-#{pet.id}", [])
   end
