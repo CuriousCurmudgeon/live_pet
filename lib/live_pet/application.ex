@@ -16,6 +16,7 @@ defmodule LivePet.Application do
       # Start Finch
       {Finch, name: LivePet.Finch},
       # Start the Endpoint (http/https)
+      LivePetWeb.Presence,
       LivePetWeb.Endpoint,
       # Start a worker by calling: LivePet.Worker.start_link(arg)
       # {LivePet.Worker, arg}
