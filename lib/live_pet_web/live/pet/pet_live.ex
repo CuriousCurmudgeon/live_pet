@@ -45,6 +45,7 @@ defmodule LivePetWeb.Pet.PetLive do
 
   @impl true
   def handle_info({:update, pet}, socket) do
+    maybe_untrack_pet(socket)
     {:noreply, assign_pet(socket, pet)}
   end
 
@@ -66,6 +67,12 @@ defmodule LivePetWeb.Pet.PetLive do
   end
 
   defp maybe_track_pet(_socket), do: nil
+
+  defp maybe_untrack_pet(%{assigns: %{pet: %Pet{is_alive: false} = pet}}) do
+    Presence.untrack_pet(self(), pet)
+  end
+
+  defp maybe_untrack_pet(_), do: nil
 
   defp assign_pet(socket, pet) do
     assign(socket, :pet, pet)
