@@ -17,6 +17,7 @@
           <div class="-mt-px flex divide-x divide-gray-200">
             <div class="flex w-0 flex-1">
               <button
+                :if={@available_treats > 0}
                 phx-click="give_treat"
                 phx-value-pet_id={pet.id}
                 class="relative -mr-px inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-bl-lg border border-transparent py-4 text-sm font-semibold text-gray-900 hover:bg-green-400"
