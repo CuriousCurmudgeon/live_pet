@@ -1,17 +1,48 @@
 <header class="px-4 sm:px-6 lg:px-8">
   <div class="flex items-center justify-between border-b border-zinc-100 py-3 text-sm">
     <div class="flex items-center gap-4">
-      <a href="/">
+      <a href="/" class="font-bold">
         THAT Pet
       </a>
-    </div>
-    <div class="flex items-center gap-4 font-semibold leading-6 text-zinc-900">
       <a href={~p"/pets"} class="hover:text-zinc-700">
         My Pets
       </a>
       <a href="https://github.com/CuriousCurmudgeon/live_pet" class="hover:text-zinc-700">
         GitHub
       </a>
+    </div>
+    <div class="flex items-center gap-4 leading-6 text-zinc-900">
+      <%= if @current_user do %>
+        <span class="text-[0.8125rem] leading-6 text-zinc-900">
+          <%= @current_user.email %>
+        </span>
+        <.link
+          href={~p"/users/settings"}
+          class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+        >
+          Settings
+        </.link>
+        <.link
+          href={~p"/users/log_out"}
+          method="delete"
+          class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+        >
+          Log out
+        </.link>
+      <% else %>
+        <.link
+          href={~p"/users/register"}
+          class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+        >
+          Register
+        </.link>
+        <.link
+          href={~p"/users/log_in"}
+          class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+        >
+          Log in
+        </.link>
+      <% end %>
     </div>
   </div>
 </header>
