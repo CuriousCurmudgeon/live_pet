@@ -3,7 +3,10 @@ defmodule LivePetWeb.Pet.PetLive do
 
   alias LivePet.Pets
   alias LivePet.Pets.Pet
-  alias LivePetWeb.Presence
+  alias LivePetWeb.Pet.ActivePetsLive
+  alias LivePetWeb.{Endpoint, Presence}
+
+  @active_pets_topic "active_pets"
 
   @impl true
   def mount(%{"id" => pet_id}, _session, socket) do
@@ -14,6 +17,7 @@ defmodule LivePetWeb.Pet.PetLive do
       {:ok, %Pet{user_id: ^current_user_id} = pet} ->
         if connected?(socket) do
           register_for_updates(pet)
+          Endpoint.subscribe(@active_pets_topic)
         end
 
         {:ok,
@@ -51,6 +55,15 @@ defmodule LivePetWeb.Pet.PetLive do
   def handle_info({:update, pet}, socket) do
     untrack_or_update_pet(pet)
     {:noreply, assign_pet(socket, pet)}
+  end
+
+  def handle_info(%{event: "presence_diff", topic: @active_pets_topic}, socket) do
+    send_update(ActivePetsLive,
+      id: socket.assigns.active_pets_component_id,
+      pet_id: socket.assigns.pet_id
+    )
+
+    {:noreply, socket}
   end
 
   @impl true

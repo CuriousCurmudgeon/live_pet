@@ -11,7 +11,9 @@ defmodule LivePetWeb.Pet.ActivePetsLive do
     assign(
       socket,
       :active_pets,
-      Presence.list_active_pets() |> Enum.filter(fn x -> x.id != pet_id end)
+      Presence.list_active_pets()
+      |> Enum.filter(fn x -> x.id != pet_id end)
+      |> Enum.sort_by(fn x -> x.name end)
     )
   end
 end
