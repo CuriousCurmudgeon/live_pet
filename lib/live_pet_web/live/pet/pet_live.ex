@@ -90,8 +90,8 @@ defmodule LivePetWeb.Pet.PetLive do
 
   defp maybe_track_pet(_socket), do: nil
 
-  defp maybe_untrack_pet(%Pet{is_alive: false} = pet) do
-    Presence.untrack_pet(self(), pet)
+  defp maybe_untrack_pet(%Pet{is_alive: false}) do
+    Presence.untrack_pet(self())
   end
 
   defp maybe_untrack_pet(_), do: nil

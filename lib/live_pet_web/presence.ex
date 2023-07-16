@@ -9,7 +9,7 @@ defmodule LivePetWeb.Presence do
     Presence.track(pid, @active_pets_topic, @active_pets_key, %{pet: pet})
   end
 
-  def untrack_pet(pid, pet) do
+  def untrack_pet(pid) do
     Presence.untrack(pid, @active_pets_topic, @active_pets_key)
   end
 
