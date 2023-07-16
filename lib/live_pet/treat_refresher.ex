@@ -18,18 +18,19 @@ defmodule LivePet.TreatRefresher do
 
   ### Server process
   def init(_) do
-    schedule_refresh()
-    {:ok, nil}
+    send(self(), :refresh_treats)
+    Logger.info("Treat refresher started")
+    {:ok, %{}}
   end
 
-  def handle_info(:refresh_treats, nil) do
+  def handle_info(:refresh_treats, state) do
     schedule_refresh()
 
     Logger.info("Topping off every user's treats")
     {total_updated, _} = Repo.update_all(User, set: [available_treats: 5])
     Logger.info("Updated #{total_updated} users")
 
-    {:noreply, nil}
+    {:noreply, state}
   end
 
   defp schedule_refresh do
