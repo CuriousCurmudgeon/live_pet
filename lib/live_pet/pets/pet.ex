@@ -6,7 +6,7 @@ defmodule LivePet.Pets.Pet do
     field :name, :string
     field :image, :string
     field :age, :integer, default: 0
-    field :hunger, :integer, default: 0
+    field :hunger, :integer, default: 250
     field :is_alive, :boolean, default: true
     belongs_to :user, LivePet.Accounts.User
 
