@@ -1,6 +1,7 @@
 defmodule LivePetWeb.Pet.PetLive do
   use LivePetWeb, :live_view
 
+  require Logger
   alias LivePet.Pets
   alias LivePet.Pets.Pet
   alias LivePetWeb.Pet.ActivePetsLive
@@ -12,19 +13,25 @@ defmodule LivePetWeb.Pet.PetLive do
   def mount(%{"id" => pet_id}, _session, socket) do
     current_user_id = socket.assigns.current_user.id
 
+    socket =
+      socket
+      |> assign_pet_id(pet_id)
+      |> assign_camping_state(:none)
+
     case Pets.Simulation.get_pet(pet_id) do
       # Current user owns pet
       {:ok, %Pet{user_id: ^current_user_id} = pet} ->
         if connected?(socket) do
           register_for_updates(pet)
           Endpoint.subscribe(@active_pets_topic)
+          Endpoint.subscribe(pet_topic(pet.id))
         end
 
         {:ok,
          socket
-         |> assign_pet_id(pet_id)
          |> assign_pet(pet)
-         |> assign(:active_pets_component_id, "active-pets")}
+         |> assign(:active_pets_component_id, "active-pets")
+         |> assign(:camping_request_component_id, "camping-request")}
 
       # Current user does not own pet
       {:ok, _} ->
@@ -57,6 +64,14 @@ defmodule LivePetWeb.Pet.PetLive do
     {:noreply, assign_pet(socket, pet)}
   end
 
+  def handle_info(
+        %{event: "camping_request", payload: %{pet_id: requesting_pet_id}} = message,
+        socket
+      ) do
+    Logger.info("Received camping request from #{requesting_pet_id}")
+    {:noreply, assign_camping_state(socket, :responding)}
+  end
+
   def handle_info(%{event: "presence_diff", topic: @active_pets_topic}, socket) do
     send_update(ActivePetsLive,
       id: socket.assigns.active_pets_component_id,
@@ -73,9 +88,9 @@ defmodule LivePetWeb.Pet.PetLive do
     {:noreply, socket}
   end
 
-  def handle_event("camping_request", %{"pet_id" => pet_id}, socket) do
-    IO.inspect(pet_id)
-    {:noreply, socket}
+  def handle_event("go_camping", %{"pet_id" => other_pet_id}, %{assigns: %{pet: pet}} = socket) do
+    Endpoint.broadcast(pet_topic(other_pet_id), "camping_request", %{pet_id: pet.id})
+    {:noreply, socket |> assign_camping_state(:requesting)}
   end
 
   defp register_for_updates(pet) do
@@ -104,5 +119,13 @@ defmodule LivePetWeb.Pet.PetLive do
 
   defp assign_pet(socket, pet) do
     assign(socket, :pet, pet)
+  end
+
+  defp assign_camping_state(socket, state) do
+    assign(socket, :camping_state, state)
+  end
+
+  defp pet_topic(pet_id) do
+    "pet:#{pet_id}"
   end
 end
