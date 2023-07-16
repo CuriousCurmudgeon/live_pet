@@ -63,8 +63,9 @@ defmodule LivePetWeb.Pet.PetLive do
     {:noreply, assign_pet(socket, pet)}
   end
 
-  def handle_info(%{event: "receive_treat"}, socket) do
+  def handle_info(%{event: "receive_treat"}, %{assigns: %{pet: pet}} = socket) do
     Logger.info("Pet #{socket.assigns.pet_id} received a treat")
+    Pets.Simulation.feed(pet.id, :treat)
     {:noreply, socket}
   end
 
