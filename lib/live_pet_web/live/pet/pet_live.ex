@@ -53,7 +53,7 @@ defmodule LivePetWeb.Pet.PetLive do
 
   @impl true
   def handle_info({:update, pet}, socket) do
-    untrack_or_update_pet(pet)
+    maybe_untrack_pet(pet)
     {:noreply, assign_pet(socket, pet)}
   end
 
@@ -90,13 +90,11 @@ defmodule LivePetWeb.Pet.PetLive do
 
   defp maybe_track_pet(_socket), do: nil
 
-  defp untrack_or_update_pet(%Pet{is_alive: false} = pet) do
+  defp maybe_untrack_pet(%Pet{is_alive: false} = pet) do
     Presence.untrack_pet(self(), pet)
   end
 
-  defp untrack_or_update_pet(%Pet{} = pet) do
-    Presence.update_pet(self(), pet)
-  end
+  defp maybe_untrack_pet(_), do: nil
 
   defp assign_pet_id(socket, pet_id) do
     # We do this because we don't want the active pets live component to update every time
