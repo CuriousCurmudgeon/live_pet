@@ -4,18 +4,14 @@ defmodule LivePetWeb.Pet.ActivePetsLive do
 
   @impl true
   def update(assigns, socket) do
-    {:ok, socket |> assign_pet(assigns.pet) |> assign_active_pets()}
+    {:ok, socket |> assign_active_pets(assigns.pet_id)}
   end
 
-  defp assign_pet(socket, pet) do
-    assign(socket, :pet, pet)
-  end
-
-  defp assign_active_pets(%{assigns: %{pet: pet}} = socket) do
+  defp assign_active_pets(socket, pet_id) do
     assign(
       socket,
       :active_pets,
-      Presence.list_active_pets() |> Enum.filter(fn x -> x.id != pet.id end)
+      Presence.list_active_pets() |> Enum.filter(fn x -> x.id != pet_id end)
     )
   end
 end
