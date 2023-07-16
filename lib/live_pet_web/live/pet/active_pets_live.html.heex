@@ -1,5 +1,7 @@
 <div class="mt-6">
-  <h3 class="text-base font-semibold leading-6 text-gray-900 pb-5">Looking For Buddies</h3>
+  <h3 class="text-base font-semibold leading-6 text-gray-900 pb-5">
+    Give Treats (<%= @available_treats %> left)
+  </h3>
 
   <%= if(length(@active_pets) > 0) do %>
     <ul role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
@@ -15,11 +17,11 @@
           <div class="-mt-px flex divide-x divide-gray-200">
             <div class="flex w-0 flex-1">
               <button
-                phx-click="go_camping"
+                phx-click="give_treat"
                 phx-value-pet_id={pet.id}
                 class="relative -mr-px inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-bl-lg border border-transparent py-4 text-sm font-semibold text-gray-900 hover:bg-green-400"
               >
-                🏕️ Go Camping
+                🍨 Give Treat
               </button>
             </div>
           </div>

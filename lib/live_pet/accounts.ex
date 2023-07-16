@@ -350,4 +350,9 @@ defmodule LivePet.Accounts do
       {:error, :user, changeset, _} -> {:error, changeset}
     end
   end
+
+  def give_treat(user) do
+    User.give_treat_changeset(user)
+    |> Repo.update()
+  end
 end

@@ -156,4 +156,10 @@ defmodule LivePet.Accounts.User do
       add_error(changeset, :current_password, "is not valid")
     end
   end
+
+  def give_treat_changeset(user) do
+    user
+    |> change(available_treats: user.available_treats - 1)
+    |> validate_number(:available_treats, greater_than_or_equal_to: 0)
+  end
 end

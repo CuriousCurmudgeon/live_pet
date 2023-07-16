@@ -2,7 +2,7 @@ defmodule LivePetWeb.Pet.PetLive do
   use LivePetWeb, :live_view
 
   require Logger
-  alias LivePet.Pets
+  alias LivePet.{Accounts, Pets}
   alias LivePet.Pets.Pet
   alias LivePetWeb.Pet.ActivePetsLive
   alias LivePetWeb.{Endpoint, Presence}
@@ -16,7 +16,6 @@ defmodule LivePetWeb.Pet.PetLive do
     socket =
       socket
       |> assign_pet_id(pet_id)
-      |> assign_camping_state(:none)
 
     case Pets.Simulation.get_pet(pet_id) do
       # Current user owns pet
@@ -31,7 +30,7 @@ defmodule LivePetWeb.Pet.PetLive do
          socket
          |> assign_pet(pet)
          |> assign(:active_pets_component_id, "active-pets")
-         |> assign(:camping_request_component_id, "camping-request")}
+         |> assign_available_treats(Accounts.get_user!(current_user_id))}
 
       # Current user does not own pet
       {:ok, _} ->
@@ -64,18 +63,16 @@ defmodule LivePetWeb.Pet.PetLive do
     {:noreply, assign_pet(socket, pet)}
   end
 
-  def handle_info(
-        %{event: "camping_request", payload: %{pet_id: requesting_pet_id}} = message,
-        socket
-      ) do
-    Logger.info("Received camping request from #{requesting_pet_id}")
-    {:noreply, assign_camping_state(socket, :responding)}
+  def handle_info(%{event: "receive_treat"}, socket) do
+    Logger.info("Pet #{socket.assigns.pet_id} received a treat")
+    {:noreply, socket}
   end
 
   def handle_info(%{event: "presence_diff", topic: @active_pets_topic}, socket) do
     send_update(ActivePetsLive,
       id: socket.assigns.active_pets_component_id,
-      pet_id: socket.assigns.pet_id
+      pet_id: socket.assigns.pet_id,
+      available_treats: socket.assigns.current_user.available_treats
     )
 
     {:noreply, socket}
@@ -88,9 +85,19 @@ defmodule LivePetWeb.Pet.PetLive do
     {:noreply, socket}
   end
 
-  def handle_event("go_camping", %{"pet_id" => other_pet_id}, %{assigns: %{pet: pet}} = socket) do
-    Endpoint.broadcast(pet_topic(other_pet_id), "camping_request", %{pet_id: pet.id})
-    {:noreply, socket |> assign_camping_state(:requesting)}
+  def handle_event("give_treat", %{"pet_id" => recipient_pet_id}, socket) do
+    socket =
+      case Accounts.give_treat(Accounts.get_user!(socket.assigns.current_user.id)) do
+        {:ok, user} ->
+          Endpoint.broadcast(pet_topic(recipient_pet_id), "receive_treat", %{})
+          assign_available_treats(socket, user)
+
+        {:error, _} ->
+          socket
+          |> put_flash(:error, "Error giving treat")
+      end
+
+    {:noreply, socket}
   end
 
   defp register_for_updates(pet) do
@@ -121,8 +128,8 @@ defmodule LivePetWeb.Pet.PetLive do
     assign(socket, :pet, pet)
   end
 
-  defp assign_camping_state(socket, state) do
-    assign(socket, :camping_state, state)
+  defp assign_available_treats(socket, user) do
+    assign(socket, :available_treats, user.available_treats)
   end
 
   defp pet_topic(pet_id) do
