@@ -93,7 +93,9 @@ defmodule LivePetWeb.Pet.PetLive do
           Endpoint.broadcast(pet_topic(recipient_pet_id), "receive_treat", %{})
           assign_available_treats(socket, user)
 
-        {:error, _} ->
+        {:error, error} ->
+          Logger.error("Error giving treat: #{inspect(error)}")
+
           socket
           |> put_flash(:error, "Error giving treat")
       end
