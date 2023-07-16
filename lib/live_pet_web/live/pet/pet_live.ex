@@ -24,13 +24,14 @@ defmodule LivePetWeb.Pet.PetLive do
           register_for_updates(pet)
           Endpoint.subscribe(@active_pets_topic)
           Endpoint.subscribe(pet_topic(pet.id))
+          Endpoint.subscribe(user_topic(current_user_id))
         end
 
         {:ok,
          socket
          |> assign_pet(pet)
          |> assign(:active_pets_component_id, "active-pets")
-         |> assign_available_treats(Accounts.get_user!(current_user_id))}
+         |> assign_available_treats(Accounts.get_user!(current_user_id).available_treats)}
 
       # Current user does not own pet
       {:ok, _} ->
@@ -69,6 +70,14 @@ defmodule LivePetWeb.Pet.PetLive do
     {:noreply, socket}
   end
 
+  def handle_info(
+        %{event: "available_treats", payload: %{available_treats: available_treats}},
+        socket
+      ) do
+    socket = assign_available_treats(socket, available_treats)
+    {:noreply, socket}
+  end
+
   def handle_info(%{event: "presence_diff", topic: @active_pets_topic}, socket) do
     send_update(ActivePetsLive,
       id: socket.assigns.active_pets_component_id,
@@ -87,11 +96,18 @@ defmodule LivePetWeb.Pet.PetLive do
   end
 
   def handle_event("give_treat", %{"pet_id" => recipient_pet_id}, socket) do
+    current_user_id = socket.assigns.current_user.id
+
     socket =
-      case Accounts.give_treat(Accounts.get_user!(socket.assigns.current_user.id)) do
+      case Accounts.give_treat(Accounts.get_user!(current_user_id)) do
         {:ok, user} ->
           Endpoint.broadcast(pet_topic(recipient_pet_id), "receive_treat", %{})
-          assign_available_treats(socket, user)
+
+          Endpoint.broadcast(user_topic(current_user_id), "available_treats", %{
+            available_treats: user.available_treats
+          })
+
+          socket
 
         {:error, error} ->
           Logger.error("Error giving treat: #{inspect(error)}")
@@ -131,11 +147,15 @@ defmodule LivePetWeb.Pet.PetLive do
     assign(socket, :pet, pet)
   end
 
-  defp assign_available_treats(socket, user) do
-    assign(socket, :available_treats, user.available_treats)
+  defp assign_available_treats(socket, available_treats) do
+    assign(socket, :available_treats, available_treats)
   end
 
   defp pet_topic(pet_id) do
     "pet:#{pet_id}"
+  end
+
+  defp user_topic(user_id) do
+    "user:#{user_id}"
   end
 end
