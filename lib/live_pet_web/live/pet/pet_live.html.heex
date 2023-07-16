@@ -17,13 +17,6 @@
 </div>
 
 <.live_component
-  :if={@camping_state != :none}
-  module={LivePetWeb.Pet.CampingRequestLive}
-  id={@camping_request_component_id}
-  state={@camping_state}
-/>
-
-<.live_component
   :if={@pet.is_alive}
   module={LivePetWeb.Pet.ActivePetsLive}
   id={@active_pets_component_id}
