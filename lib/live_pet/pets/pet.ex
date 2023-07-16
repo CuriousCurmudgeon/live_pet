@@ -60,7 +60,7 @@ defmodule LivePet.Pets.Pet do
   end
 
   defp get_food_type_stats(type) do
-    %{normal: %{hunger: 100}, treat: %{hunger: 10}}
+    %{normal: %{hunger: 100}, treat: %{hunger: 20}}
     |> Map.get(type)
   end
 end
