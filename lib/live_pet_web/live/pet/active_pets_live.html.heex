@@ -20,9 +20,9 @@
                 :if={@available_treats > 0}
                 phx-click="give_treat"
                 phx-value-pet_id={pet.id}
-                class="relative -mr-px inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-bl-lg border border-transparent py-4 text-sm font-semibold text-gray-900 hover:bg-green-400"
+                class="relative -mr-px inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-bl-lg border border-transparent py-4 text-sm font-semibold text-gray-900 active:bg-green-400"
               >
-                🍨 Give Treat
+                🍨 Give Treat (<%= @available_treats %> left)
               </button>
             </div>
           </div>
