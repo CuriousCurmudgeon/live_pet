@@ -80,7 +80,7 @@ defmodule LivePetWeb.Pet.PetLive do
 
   @impl true
   def handle_event("feed", _, %{assigns: %{pet: pet}} = socket) do
-    Pets.Simulation.feed(pet.id)
+    Pets.Simulation.feed(pet.id, :normal)
 
     {:noreply, socket}
   end

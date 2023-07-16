@@ -53,8 +53,8 @@ defmodule LivePet.Pets.Simulation do
       iex> feed(123)
       :ok
   """
-  def feed(pet_id) do
-    GenServer.cast(get_process_name(pet_id), :feed)
+  def feed(pet_id, type) when type in [:normal, :treat] do
+    GenServer.cast(get_process_name(pet_id), {:feed, type})
   end
 
   defp get_process_name(pet_id) do
@@ -96,9 +96,12 @@ defmodule LivePet.Pets.Simulation do
     {:reply, pet, pet}
   end
 
-  def handle_cast(:feed, pet) do
+  def handle_cast({:feed, type}, pet) do
     {:noreply,
-     Pets.change_pet(pet) |> Pet.feed() |> Ecto.Changeset.apply_changes() |> update_viewers()}
+     Pets.change_pet(pet)
+     |> Pet.feed(type)
+     |> Ecto.Changeset.apply_changes()
+     |> update_viewers()}
   end
 
   def terminate(reason, pet) do

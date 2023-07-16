@@ -52,9 +52,15 @@ defmodule LivePet.Pets.Pet do
   @doc """
   Feed the pet represented by the changeset and return an updated changeset
   """
-  def feed(%Ecto.Changeset{} = changeset) do
+  def feed(%Ecto.Changeset{} = changeset, type) do
     {_, current_hunger} = Ecto.Changeset.fetch_field(changeset, :hunger)
+    stats = get_food_type_stats(type)
 
-    Ecto.Changeset.put_change(changeset, :hunger, Kernel.max(current_hunger - 100, 0))
+    Ecto.Changeset.put_change(changeset, :hunger, Kernel.max(current_hunger - stats.hunger, 0))
+  end
+
+  defp get_food_type_stats(type) do
+    %{normal: %{hunger: 100}, treat: %{hunger: 10}}
+    |> Map.get(type)
   end
 end
