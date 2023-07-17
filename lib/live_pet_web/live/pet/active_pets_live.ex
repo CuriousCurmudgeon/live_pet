@@ -2,7 +2,7 @@ defmodule LivePetWeb.Pet.ActivePetsLive do
   use LivePetWeb, :live_component
 
   require Logger
-  alias LivePet.Accounts
+  alias LivePet.{Accounts, Pets}
   alias LivePetWeb.{Endpoint, Presence}
 
   @impl true
@@ -22,9 +22,7 @@ defmodule LivePetWeb.Pet.ActivePetsLive do
       case Accounts.give_treat(Accounts.get_user!(user_id)) do
         {:ok, user} ->
           Logger.info("User #{user_id} is giving a treat to pet #{recipient_pet_id}")
-
-          Endpoint.pet_topic(recipient_pet_id)
-          |> Endpoint.broadcast("receive_treat", %{})
+          Pets.Simulation.feed(recipient_pet_id, :treat)
 
           Endpoint.user_topic(user_id)
           |> Endpoint.broadcast("available_treats", %{available_treats: user.available_treats})

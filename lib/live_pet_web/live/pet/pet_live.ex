@@ -23,7 +23,6 @@ defmodule LivePetWeb.Pet.PetLive do
         if connected?(socket) do
           register_for_updates(pet)
           Endpoint.subscribe(@active_pets_topic)
-          Endpoint.pet_topic(pet_id) |> Endpoint.subscribe()
           Endpoint.user_topic(current_user_id) |> Endpoint.subscribe()
         end
 
@@ -62,12 +61,6 @@ defmodule LivePetWeb.Pet.PetLive do
   def handle_info({:update, pet}, socket) do
     maybe_untrack_pet(pet)
     {:noreply, assign_pet(socket, pet)}
-  end
-
-  def handle_info(%{event: "receive_treat"}, %{assigns: %{pet: pet}} = socket) do
-    Logger.info("Pet #{socket.assigns.pet_id} received a treat")
-    Pets.Simulation.feed(pet.id, :treat)
-    {:noreply, socket}
   end
 
   def handle_info(
