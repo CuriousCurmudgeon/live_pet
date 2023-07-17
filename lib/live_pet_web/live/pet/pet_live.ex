@@ -24,6 +24,7 @@ defmodule LivePetWeb.Pet.PetLive do
           register_for_updates(pet)
           Endpoint.subscribe(@active_pets_topic)
           Endpoint.user_topic(current_user_id) |> Endpoint.subscribe()
+          Presence.track_pet(self(), pet)
         end
 
         {:ok,
@@ -49,12 +50,6 @@ defmodule LivePetWeb.Pet.PetLive do
          |> put_flash(:error, "Pet not found")
          |> redirect(to: ~p"/pets")}
     end
-  end
-
-  @impl true
-  def handle_params(_params, _uri, socket) do
-    maybe_track_pet(socket)
-    {:noreply, socket}
   end
 
   @impl true
@@ -94,14 +89,6 @@ defmodule LivePetWeb.Pet.PetLive do
   defp register_for_updates(pet) do
     {:ok, _} = Registry.register(Registry.PetViewers, "pet-#{pet.id}", [])
   end
-
-  defp maybe_track_pet(%{assigns: %{pet: %Pet{is_alive: true} = pet}} = socket) do
-    if connected?(socket) do
-      Presence.track_pet(self(), pet)
-    end
-  end
-
-  defp maybe_track_pet(_socket), do: nil
 
   defp maybe_untrack_pet(%Pet{is_alive: false}) do
     Presence.untrack_pet(self())
