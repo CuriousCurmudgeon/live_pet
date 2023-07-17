@@ -23,8 +23,8 @@ defmodule LivePetWeb.Pet.PetLive do
         if connected?(socket) do
           register_for_updates(pet)
           Endpoint.subscribe(@active_pets_topic)
-          Endpoint.subscribe(pet_topic(pet.id))
-          Endpoint.subscribe(user_topic(current_user_id))
+          Endpoint.pet_topic(pet_id) |> Endpoint.subscribe()
+          Endpoint.user_topic(current_user_id) |> Endpoint.subscribe()
         end
 
         {:ok,
@@ -79,10 +79,13 @@ defmodule LivePetWeb.Pet.PetLive do
   end
 
   def handle_info(%{event: "presence_diff", topic: @active_pets_topic}, socket) do
+    current_user = socket.assigns.current_user
+
     send_update(ActivePetsLive,
       id: socket.assigns.active_pets_component_id,
       pet_id: socket.assigns.pet_id,
-      available_treats: socket.assigns.current_user.available_treats
+      available_treats: current_user.available_treats,
+      user: current_user
     )
 
     {:noreply, socket}
@@ -91,30 +94,6 @@ defmodule LivePetWeb.Pet.PetLive do
   @impl true
   def handle_event("feed", _, %{assigns: %{pet: pet}} = socket) do
     Pets.Simulation.feed(pet.id, :normal)
-
-    {:noreply, socket}
-  end
-
-  def handle_event("give_treat", %{"pet_id" => recipient_pet_id}, socket) do
-    current_user_id = socket.assigns.current_user.id
-
-    socket =
-      case Accounts.give_treat(Accounts.get_user!(current_user_id)) do
-        {:ok, user} ->
-          Endpoint.broadcast(pet_topic(recipient_pet_id), "receive_treat", %{})
-
-          Endpoint.broadcast(user_topic(current_user_id), "available_treats", %{
-            available_treats: user.available_treats
-          })
-
-          socket
-
-        {:error, error} ->
-          Logger.error("Error giving treat: #{inspect(error)}")
-
-          socket
-          |> put_flash(:error, "Error giving treat")
-      end
 
     {:noreply, socket}
   end
@@ -149,13 +128,5 @@ defmodule LivePetWeb.Pet.PetLive do
 
   defp assign_available_treats(socket, available_treats) do
     assign(socket, :available_treats, available_treats)
-  end
-
-  defp pet_topic(pet_id) do
-    "pet:#{pet_id}"
-  end
-
-  defp user_topic(user_id) do
-    "user:#{user_id}"
   end
 end
