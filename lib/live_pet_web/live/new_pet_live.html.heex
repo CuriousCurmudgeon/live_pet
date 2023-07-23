@@ -1,5 +1,14 @@
 <.header>New Pet</.header>
 
+<.warning title="Be Respectful With Pet Names">
+  <p>
+    Other users will be able to see the name of your pet. If in doubt, read the <.link
+      class="underline"
+      href="https://that.us/support/code-of-conduct/"
+    > code of conduct </.link>. If still in doubt, choose a different name.
+  </p>
+</.warning>
+
 <.simple_form for={@form} id="pet_form" phx-submit="save" phx-change="validate">
   <.input field={@form[:name]} type="text" label="Name" required />
   <.input field={@form[:image]} type="hidden" required value={@selected_image} />
