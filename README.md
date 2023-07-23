@@ -21,6 +21,10 @@ A lot of this is very naive and not optimized. The goal is to show off some of t
 Each pet's state updates every five seconds. Currently, they just get older and hungrier. Persistence is handled by a separate `LivePet.Pets.Persister` process that persists every pet to the DB every minute. Moving the persistence out of the each pet process is a naive strategy to limit the number of DB connections. Allowing each pet to persist every X ticks can lead to DB connections being a bottleneck.
 
 ## LiveView
-Navigating to the live view for a pet starts registers the live view process with the pet viewers registry. On every tick, the pet process dispatches a message to all of it's viewers so that the UI can be updated with the new state.
+Navigating to the live view for a live pet starts registers the live view process with the pet viewers registry. On every tick, the pet process dispatches a message to all of it's viewers so that the UI can be updated with the new state.
 
-The live view does not currently handle viewing a dead pet because there is no process to connect to.
+You can visit dead pets, but the live view will not connect to a running process.
+
+You can interact with your pets by feeding them. You can interact with live pets that other users are viewing by giving them treats. There is a GenServer that tops off each user's treats to five when the app starts and every thirty minutes while running.
+
+The list of active pets is done using the `Phoenix.Presence` module.
