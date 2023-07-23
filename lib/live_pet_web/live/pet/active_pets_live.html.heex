@@ -1,6 +1,6 @@
 <div class="mt-6">
   <h3 class="text-base font-semibold leading-6 text-gray-900 pb-5">
-    Give Treats (<%= @available_treats %> left)
+    Active Pets (<%= length(@active_pets) %>)
   </h3>
 
   <%= if(length(@active_pets) > 0) do %>
