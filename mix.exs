@@ -32,25 +32,25 @@ defmodule LivePet.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:bcrypt_elixir, "~> 3.1"},
-      {:phoenix, "~> 1.7.14"},
-      {:phoenix_ecto, "~> 4.6.2"},
-      {:ecto_sql, "~> 3.11.3"},
-      {:postgrex, ">= 0.18.0"},
-      {:phoenix_html, "~> 4.1.1"},
+      {:bcrypt_elixir, "~> 3.2"},
+      {:phoenix, "~> 1.7.18"},
+      {:phoenix_ecto, "~> 4.6.3"},
+      {:ecto_sql, "~> 3.12.1"},
+      {:postgrex, ">= 0.19.3"},
+      {:phoenix_html, "~> 4.2.0"},
       {:phoenix_live_reload, "~> 1.5.3", only: :dev},
-      {:phoenix_live_view, "~> 0.20.17"},
-      {:floki, ">= 0.36.2", only: :test},
-      {:phoenix_live_dashboard, "~> 0.8.4"},
-      {:esbuild, "~> 0.8.1", runtime: Mix.env() == :dev},
-      {:tailwind, "~> 0.2.3", runtime: Mix.env() == :dev},
-      {:swoosh, "~> 1.16.9"},
-      {:finch, "~> 0.18"},
+      {:phoenix_live_view, "~> 1.0.1"},
+      {:floki, ">= 0.37.0", only: :test},
+      {:phoenix_live_dashboard, "~> 0.8.6"},
+      {:esbuild, "~> 0.8.2", runtime: Mix.env() == :dev},
+      {:tailwind, "~> 0.2.4", runtime: Mix.env() == :dev},
+      {:swoosh, "~> 1.17.6"},
+      {:finch, "~> 0.19"},
       {:telemetry_metrics, "~> 1.0.0"},
       {:telemetry_poller, "~> 1.1.0"},
-      {:gettext, "~> 0.24.0"},
-      {:jason, "~> 1.4.3"},
-      {:plug_cowboy, "~> 2.7.1"}
+      {:gettext, "~> 0.26.2"},
+      {:jason, "~> 1.4.4"},
+      {:plug_cowboy, "~> 2.7.2"}
     ]
   end
 
