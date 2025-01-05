@@ -16,7 +16,7 @@ alias LivePet.Repo
 
 Repo.delete_all(Pet)
 
-pet_count = 10_000
+pet_count = 10
 chunk_size = 10_000
 
 # Copied from LivePet.AccountsFixtures. Test module stuff
@@ -30,9 +30,18 @@ chunk_size = 10_000
 
 timestamp = DateTime.utc_now() |> DateTime.to_naive() |> NaiveDateTime.truncate(:second)
 
+pet_images = File.ls!("priv/static/images/pets")
+
 1..pet_count
 |> Enum.map(fn i ->
-  %{name: "pet-#{i}", age: 0, user_id: user.id, inserted_at: timestamp, updated_at: timestamp}
+  %{
+    name: "pet-#{i}",
+    image: "/images/pets/#{Enum.random(pet_images)}",
+    age: 0,
+    user_id: user.id,
+    inserted_at: timestamp,
+    updated_at: timestamp
+  }
 end)
 |> Enum.chunk_every(chunk_size)
 |> Enum.each(fn pets -> Repo.insert_all(Pet, pets) end)
