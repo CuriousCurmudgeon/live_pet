@@ -43,7 +43,7 @@ defmodule LivePetWeb do
         layouts: [html: LivePetWeb.Layouts]
 
       import Plug.Conn
-      import LivePetWeb.Gettext
+      use Gettext, backend: LivePet.Gettext
 
       unquote(verified_routes())
     end
@@ -85,7 +85,7 @@ defmodule LivePetWeb do
       import Phoenix.HTML
       # Core UI components and translation
       import LivePetWeb.CoreComponents
-      import LivePetWeb.Gettext
+      use Gettext, backend: LivePet.Gettext
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
