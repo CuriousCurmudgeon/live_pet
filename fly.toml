@@ -1,26 +1,34 @@
-# fly.toml app configuration file generated for that-pet on 2023-05-29T09:40:21-04:00
+# fly.toml app configuration file generated for pet-mash on 2025-01-08T20:28:25-05:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "that-pet"
-primary_region = "ord"
-kill_signal = "SIGTERM"
+app = 'pet-mash'
+primary_region = 'ord'
+kill_signal = 'SIGTERM'
+
+[build]
 
 [deploy]
-  release_command = "/app/bin/migrate"
+  release_command = '/app/bin/migrate'
 
 [env]
-  PHX_HOST = "that-pet.fly.dev"
-  PORT = "8080"
+  PHX_HOST = 'pet-mash.fly.dev'
+  PORT = '8080'
 
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = false
+  auto_stop_machines = 'stop'
   auto_start_machines = false
   min_machines_running = 0
+
   [http_service.concurrency]
-    type = "connections"
+    type = 'connections'
     hard_limit = 1000
     soft_limit = 1000
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1

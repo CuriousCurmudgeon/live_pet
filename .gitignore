@@ -35,3 +35,4 @@ live_pet-*.tar
 npm-debug.log
 /assets/node_modules/
 
+/.lexical
