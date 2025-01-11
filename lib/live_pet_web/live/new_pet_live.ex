@@ -13,6 +13,7 @@ defmodule LivePetWeb.NewPetLive do
     else
       Logger.info("in disconnected mount")
     end
+
     changeset = Pets.change_pet(%Pet{})
     {:ok, socket |> assign_images() |> assign_selected_image(nil) |> assign_form(changeset)}
   end

@@ -1,6 +1,6 @@
 <div class="grid grid-cols-2 gap-6">
   <.header class="col-span-2">
-    <%= @pet.name %> <span :if={!@pet.is_alive}>☠️</span>
+    {@pet.name} <span :if={!@pet.is_alive}>☠️</span>
     <:actions :if={@pet.is_alive}>
       <.button phx-click="feed">Feed 🍎</.button>
     </:actions>
@@ -9,7 +9,7 @@
     <img class="w-auto" src={@pet.image} />
   </div>
   <.list>
-    <:item title="Age"><%= @pet.age %></:item>
+    <:item title="Age">{@pet.age}</:item>
     <:item title="Hunger">
       <LivePetWeb.PetComponents.hearts class="" hunger={@pet.hunger} />
     </:item>
