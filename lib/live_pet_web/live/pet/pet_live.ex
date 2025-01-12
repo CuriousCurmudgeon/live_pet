@@ -21,8 +21,7 @@ defmodule LivePetWeb.Pet.PetLive do
       # Current user owns pet
       {:ok, %Pet{user_id: ^current_user_id} = pet} ->
         if connected?(socket) do
-          register_for_updates(pet)
-
+          PubSub.subscribe_to_pet_topic(pet.id)
           PubSub.subscribe_to_active_pets_topic()
           PubSub.subscribe_to_user_topic(current_user_id)
           Presence.track_pet(self(), pet)
@@ -54,7 +53,7 @@ defmodule LivePetWeb.Pet.PetLive do
   end
 
   @impl true
-  def handle_info({:update, pet}, socket) do
+  def handle_info(%{event: "update", payload: pet}, socket) do
     maybe_untrack_pet(pet)
     {:noreply, assign_pet(socket, pet)}
   end
@@ -85,10 +84,6 @@ defmodule LivePetWeb.Pet.PetLive do
     Pets.Simulation.feed(pet.id, :normal)
 
     {:noreply, socket}
-  end
-
-  defp register_for_updates(pet) do
-    {:ok, _} = Registry.register(Registry.PetViewers, "pet-#{pet.id}", [])
   end
 
   defp maybe_untrack_pet(%Pet{is_alive: false}) do

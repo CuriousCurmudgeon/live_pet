@@ -13,6 +13,25 @@ defmodule LivePet.PubSub do
 
   def active_pets_topic, do: "active_pets"
 
+  #############
+  # Pet Topic #
+  #############
+  def subscribe_to_pet_topic(pet_id) do
+    pet_id
+    |> pet_topic()
+    |> subscribe()
+  end
+
+  def pet_topic(pet_id) do
+    "pet:#{pet_id}"
+  end
+
+  def broadcast_pet_update(pet) do
+    pet.id
+    |> pet_topic()
+    |> broadcast("update", pet)
+  end
+
   ##############
   # User Topic #
   ##############

@@ -9,6 +9,7 @@ defmodule LivePet.Pets.Simulation do
   require Logger
   alias LivePet.Pets
   alias LivePet.Pets.Pet
+  alias LivePet.PubSub
 
   @tick_length_in_milliseconds 5 * 1000
 
@@ -135,10 +136,7 @@ defmodule LivePet.Pets.Simulation do
   end
 
   defp update_viewers(pet) do
-    Registry.dispatch(Registry.PetViewers, "pet-#{pet.id}", fn entries ->
-      for {pid, _} <- entries, do: send(pid, {:update, pet})
-    end)
-
+    PubSub.broadcast_pet_update(pet)
     pet
   end
 end
