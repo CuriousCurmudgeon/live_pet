@@ -2,8 +2,8 @@ defmodule LivePetWeb.Pet.ActivePetsLive do
   use LivePetWeb, :live_component
 
   require Logger
-  alias LivePet.{Accounts, Pets}
-  alias LivePetWeb.{Endpoint, Presence}
+  alias LivePet.{Accounts, Pets, PubSub}
+  alias LivePetWeb.Presence
 
   @impl true
   def update(assigns, socket) do
@@ -24,8 +24,7 @@ defmodule LivePetWeb.Pet.ActivePetsLive do
           Logger.info("User #{user_id} is giving a treat to pet #{recipient_pet_id}")
           Pets.Simulation.feed(recipient_pet_id, :treat)
 
-          Endpoint.user_topic(user_id)
-          |> Endpoint.broadcast("available_treats", %{available_treats: user.available_treats})
+          PubSub.broadcast_user_available_treats(user)
 
           socket
 

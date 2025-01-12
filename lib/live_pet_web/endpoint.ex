@@ -48,8 +48,4 @@ defmodule LivePetWeb.Endpoint do
   plug Plug.Head
   plug Plug.Session, @session_options
   plug LivePetWeb.Router
-
-  def user_topic(user_id) do
-    "user:#{user_id}"
-  end
 end

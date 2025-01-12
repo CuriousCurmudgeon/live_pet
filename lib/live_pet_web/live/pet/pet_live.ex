@@ -2,12 +2,12 @@ defmodule LivePetWeb.Pet.PetLive do
   use LivePetWeb, :live_view
 
   require Logger
-  alias LivePet.{Accounts, Pets}
+  alias LivePet.{Accounts, Pets, PubSub}
   alias LivePet.Pets.Pet
   alias LivePetWeb.Pet.ActivePetsLive
-  alias LivePetWeb.{Endpoint, Presence}
+  alias LivePetWeb.Presence
 
-  @active_pets_topic "active_pets"
+  @active_pets_topic PubSub.active_pets_topic()
 
   @impl true
   def mount(%{"id" => pet_id}, _session, socket) do
@@ -22,8 +22,9 @@ defmodule LivePetWeb.Pet.PetLive do
       {:ok, %Pet{user_id: ^current_user_id} = pet} ->
         if connected?(socket) do
           register_for_updates(pet)
-          Endpoint.subscribe(@active_pets_topic)
-          Endpoint.user_topic(current_user_id) |> Endpoint.subscribe()
+
+          PubSub.subscribe_to_active_pets_topic()
+          PubSub.subscribe_to_user_topic(current_user_id)
           Presence.track_pet(self(), pet)
         end
 
